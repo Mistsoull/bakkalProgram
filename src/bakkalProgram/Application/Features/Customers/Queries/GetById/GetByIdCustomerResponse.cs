@@ -1,0 +1,12 @@
+using NArchitecture.Core.Application.Responses;
+
+namespace Application.Features.Customers.Queries.GetById;
+
+public class GetByIdCustomerResponse : IResponse
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string Surname { get; set; }
+    public string PhoneNumber { get; set; }
+    public string Note { get; set; }
+}
