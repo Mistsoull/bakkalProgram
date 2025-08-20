@@ -4,30 +4,188 @@
  */
 
 // DOM Element Referansları
-let categoriesTableBody;
+let categoriesTable;
+let categoriesDataTable;
 let addCategoryForm;
 let categoryNameInput;
 let addCategoryButton;
 
 // DOM yüklendiğinde başlat
 document.addEventListener('DOMContentLoaded', function() {
-    initializeElements();
-    setupEventListeners();
-    loadCategories();
+    // jQuery ve DataTables yüklenene kadar bekle
+    function waitForDependencies() {
+        if (typeof $ === 'undefined' || typeof $.fn.DataTable === 'undefined' || typeof $.fn.DataTable.Buttons === 'undefined') {
+            console.warn('jQuery, DataTables veya Buttons henüz yüklenmedi, 200ms sonra tekrar denenecek');
+            setTimeout(waitForDependencies, 200);
+        } else {
+            console.log('Tüm bağımlılıklar yüklendi, başlatılıyor...');
+            initializeElements();
+            setupEventListeners();
+            loadCategories();
+        }
+    }
+    
+    waitForDependencies();
 });
 
 /**
  * DOM element referanslarını başlat
  */
 function initializeElements() {
-    // Tablo gövdesini al - mevcut tablo yapısını kullan
-    categoriesTableBody = document.querySelector('table tbody');
+    // DataTable tablosunu al
+    categoriesTable = document.getElementById('categories-datatable');
     
     // Kategori ekleme formu için - kategoriler sayfasındaysak modal oluşturacağız
     // veya add-category sayfasındaysak mevcut formu kullanacağız
     addCategoryForm = document.getElementById('categoryForm') || document.getElementById('add-category-form');
     categoryNameInput = document.getElementById('categoryName') || document.getElementById('category-name-input');
     addCategoryButton = document.querySelector('button[type="submit"]') || document.getElementById('add-category-button');
+    
+    // DataTable'ı başlat
+    if (categoriesTable) {
+        initializeDataTable();
+    }
+}
+
+/**
+ * DataTable'ı başlat
+ */
+function initializeDataTable() {
+    if (!categoriesTable) return;
+    
+    try {
+        console.log('DataTable başlatılıyor...');
+        console.log('jQuery sürümü:', $.fn.jquery);
+        console.log('DataTables mevcut:', !!$.fn.DataTable);
+        console.log('Buttons mevcut:', !!$.fn.DataTable.Buttons);
+        
+        categoriesDataTable = $(categoriesTable).DataTable({
+            responsive: true,
+            pageLength: 25,
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            processing: true,
+            search: {
+                caseInsensitive: true
+            },
+            dom: '<"row"<"col-sm-6"B><"col-sm-6"f>>' +
+                 '<"row"<"col-sm-12"tr>>' +
+                 '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: '<i class="fas fa-copy me-1"></i>Kopyala',
+                    exportOptions: {
+                        columns: [0, 1, 2],
+                        format: {
+                            body: function (data, row, column, node) {
+                                return data.replace(/<.*?>/g, '').trim();
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'csv',
+                    text: '<i class="fas fa-file-csv me-1"></i>CSV',
+                    filename: 'kategoriler_' + new Date().toISOString().slice(0,10),
+                    exportOptions: {
+                        columns: [0, 1, 2], // Sadece kategori adı, ürün sayısı ve tarih sütunları
+                        format: {
+                            body: function (data, row, column, node) {
+                                // HTML etiketlerini temizle
+                                return data.replace(/<.*?>/g, '').trim();
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: '<i class="fas fa-file-excel me-1"></i>Excel',
+                    filename: 'kategoriler_' + new Date().toISOString().slice(0,10),
+                    title: 'Kategori Listesi',
+                    exportOptions: {
+                        columns: [0, 1, 2],
+                        format: {
+                            body: function (data, row, column, node) {
+                                return data.replace(/<.*?>/g, '').trim();
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: '<i class="fas fa-file-pdf me-1"></i>PDF',
+                    filename: 'kategoriler_' + new Date().toISOString().slice(0,10),
+                    title: 'Kategori Listesi',
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    exportOptions: {
+                        columns: [0, 1, 2],
+                        format: {
+                            body: function (data, row, column, node) {
+                                return data.replace(/<.*?>/g, '').trim();
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fas fa-print me-1"></i>Yazdır',
+                    title: 'Kategori Listesi',
+                    exportOptions: {
+                        columns: [0, 1, 2],
+                        format: {
+                            body: function (data, row, column, node) {
+                                return data.replace(/<.*?>/g, '').trim();
+                            }
+                        }
+                    }
+                }
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json'
+            },
+            order: [[2, 'desc']], // Eklenme tarihine göre azalan sıralama
+            columnDefs: [
+                {
+                    targets: [3], // İşlemler sütunu
+                    orderable: false,
+                    searchable: false,
+                    width: "140px",
+                    className: "text-center"
+                }
+            ],
+            drawCallback: function() {
+                // DataTable yeniden çizildiğinde tooltip'leri yeniden başlat
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
+        });
+        
+        // Button stillerini uygula
+        $('.dt-buttons .btn').removeClass('dt-button').addClass('me-2 mb-2');
+        
+        console.log('DataTable başarıyla başlatıldı');
+        console.log('Buttons mevcut:', !!categoriesDataTable.buttons);
+        
+    } catch (error) {
+        console.error('DataTable başlatılamadı:', error);
+        // Hata durumunda basit bir export butonu ekle
+        setTimeout(() => {
+            if ($('.dt-buttons').length === 0) {
+                const table = $(categoriesTable);
+                const simpleButtons = `
+                    <div class="mb-3">
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="alert('Export özelliği yüklenemedi')">
+                            <i class="fas fa-download me-1"></i>Export
+                        </button>
+                    </div>
+                `;
+                table.closest('.table-responsive').before(simpleButtons);
+            }
+        }, 500);
+    }
 }
 
 /**
@@ -41,12 +199,15 @@ function setupEventListeners() {
 }
 
 /**
- * API'den kategorileri yükle ve tabloyu doldur
+ * API'den kategorileri yükle ve DataTable'a ekle
  * @param {number} pageIndex - Sayfa indeksi (varsayılan: 0)
- * @param {number} pageSize - Sayfa boyutu (kategoriler için varsayılan: 50)
+ * @param {number} pageSize - Sayfa boyutu (kategoriler için varsayılan: 1000)
  */
-async function loadCategories(pageIndex = 0, pageSize = 50) {
-    if (!categoriesTableBody) return;
+async function loadCategories(pageIndex = 0, pageSize = 1000) {
+    if (!categoriesDataTable) {
+        console.warn('DataTable henüz başlatılmamış');
+        return;
+    }
 
     try {
         // Yükleniyor durumunu göster
@@ -57,19 +218,23 @@ async function loadCategories(pageIndex = 0, pageSize = 50) {
         
         console.log('API Yanıtı:', response); // Debug log
 
-        // Yükleniyor durumunu temizle
-        categoriesTableBody.innerHTML = '';
-
         // Sayfalanmış yanıtı işle - yanıt items dizisi içerebilir veya doğrudan dizi olabilir
         const categories = response.items || response;
         
         console.log('Kategoriler:', categories); // Debug log
 
+        // DataTable'ı temizle
+        categoriesDataTable.clear();
+
         if (categories && categories.length > 0) {
-            // Tabloyu kategorilerle doldur
+            // DataTable'a kategorileri ekle
             categories.forEach(category => {
-                const row = createCategoryRow(category);
-                categoriesTableBody.appendChild(row);
+                try {
+                    const rowData = createCategoryRowData(category);
+                    categoriesDataTable.row.add(rowData);
+                } catch (rowError) {
+                    console.error('Kategori satırı eklenirken hata:', rowError, category);
+                }
             });
 
             // Yanıtta sayfalama bilgisi varsa, burada işleyebilirsiniz
@@ -77,10 +242,11 @@ async function loadCategories(pageIndex = 0, pageSize = 50) {
                 console.log(`${response.totalCount} kategoriden ${categories.length} tanesi yüklendi`);
                 // TODO: Gerekirse sayfalama kontrolleri ekle
             }
-        } else {
-            // Boş durumu göster
-            showEmptyState();
         }
+
+        // DataTable'ı yeniden çiz
+        categoriesDataTable.draw();
+
     } catch (error) {
         console.error('Kategoriler yüklenemedi:', error);
         console.error('Hata detayları:', {
@@ -95,74 +261,44 @@ async function loadCategories(pageIndex = 0, pageSize = 50) {
 }
 
 /**
- * Tabloda yükleniyor durumunu göster
+ * DataTable için yükleniyor durumunu göster
  */
 function showLoadingState() {
-    if (!categoriesTableBody) return;
+    if (!categoriesDataTable) return;
     
-    categoriesTableBody.innerHTML = `
-        <tr>
-            <td colspan="5" class="text-center py-4">
-                <div class="d-flex align-items-center justify-content-center">
-                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
-                        <span class="visually-hidden">Yükleniyor...</span>
-                    </div>
-                    <span>Kategoriler yükleniyor...</span>
-                </div>
-            </td>
-        </tr>
-    `;
+    try {
+        // DataTable için loading processing özelliğini kullan
+        categoriesDataTable.processing(true);
+    } catch (error) {
+        console.warn('DataTable processing durumu ayarlanamadı:', error);
+    }
 }
 
 /**
- * Tabloda boş durum göster
+ * DataTable için boş durum göster (DataTable otomatik olarak halleder)
  */
 function showEmptyState() {
-    if (!categoriesTableBody) return;
-    
-    categoriesTableBody.innerHTML = `
-        <tr>
-            <td colspan="5" class="text-center py-5">
-                <div class="text-muted">
-                    <i class="fas fa-inbox fs-1 mb-3 d-block text-muted"></i>
-                    <h6>Henüz kategori bulunmuyor</h6>
-                    <p class="mb-0">İlk kategorinizi eklemek için yukarıdaki "Yeni Kategori Ekle" butonunu kullanın.</p>
-                </div>
-            </td>
-        </tr>
-    `;
+    // DataTable otomatik olarak "No data available" mesajı gösterir
+    console.log('Henüz kategori bulunmuyor');
 }
 
 /**
- * Tabloda hata durumu göster
+ * DataTable için hata durumu göster
  */
 function showErrorState() {
-    if (!categoriesTableBody) return;
+    if (!categoriesDataTable) return;
     
-    categoriesTableBody.innerHTML = `
-        <tr>
-            <td colspan="5" class="text-center py-5">
-                <div class="text-danger">
-                    <i class="fas fa-exclamation-triangle fs-1 mb-3 d-block"></i>
-                    <h6>Veri yüklenirken hata oluştu</h6>
-                    <p class="mb-0">Lütfen internet bağlantınızı kontrol edin ve sayfayı yenileyin.</p>
-                    <button class="btn btn-outline-primary btn-sm mt-2" onclick="loadCategories()">
-                        <i class="fas fa-redo me-1"></i>Tekrar Dene
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `;
+    // DataTable'ı temizle ve hata mesajı göster
+    categoriesDataTable.clear().draw();
+    showNotification('Veri yüklenirken hata oluştu. Lütfen internet bağlantınızı kontrol edin ve sayfayı yenileyin.', 'error');
 }
 
 /**
- * Bir kategori için tablo satırı oluştur
+ * DataTable için kategori satır verisi oluştur
  * @param {Object} category - API'den gelen kategori verisi
- * @returns {HTMLElement} - Tablo satır elementi
+ * @returns {Array} - DataTable satır verisi
  */
-function createCategoryRow(category) {
-    const row = document.createElement('tr');
-    
+function createCategoryRowData(category) {
     // Tarih formatla (varsa)
     const formatDate = (dateString) => {
         if (!dateString) return new Date().toLocaleDateString('tr-TR');
@@ -182,50 +318,33 @@ function createCategoryRow(category) {
 
     const iconClass = categoryIcons[category.name] || categoryIcons.default;
 
-    row.innerHTML = `
-        <td>
-            <div class="d-flex align-items-center">
-                <div class="me-3">
-                    <i class="${iconClass} fs-6"></i>
-                </div>
-                <div>
-                    <h6 class="fs-4 fw-semibold mb-0">${escapeHtml(category.name)}</h6>
-                </div>
+    return [
+        // Kategori Adı
+        `<div class="d-flex align-items-center">
+            <div class="me-3">
+                <i class="${iconClass} fs-6"></i>
             </div>
-        </td>
-        <td>
-            <span class="badge bg-info-subtle text-info">${category.products?.length || 0} ürün</span>
-        </td>
-        <td>
-            <p class="mb-0 fw-normal">${formatDate(category.createdDate)}</p>
-        </td>
-        <td>
-            <div class="dropdown dropstart">
-                <a href="javascript:void(0)" class="text-muted" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="ti ti-dots-vertical fs-6"></i>
-                </a>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)" onclick="viewCategory('${category.id}')">
-                            <i class="fs-4 ti ti-eye"></i>Görüntüle
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)" onclick="editCategory('${category.id}')">
-                            <i class="fs-4 ti ti-edit"></i>Düzenle
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center gap-3 text-danger" href="javascript:void(0)" onclick="deleteCategory('${category.id}', '${escapeHtml(category.name)}')">
-                            <i class="fs-4 ti ti-trash"></i>Sil
-                        </a>
-                    </li>
-                </ul>
+            <div>
+                <h6 class="fs-4 fw-semibold mb-0">${escapeHtml(category.name)}</h6>
             </div>
-        </td>
-    `;
-
-    return row;
+        </div>`,
+        
+        // Ürün Sayısı
+        `<span class="badge bg-info-subtle text-info">${category.products?.length || 0} ürün</span>`,
+        
+        // Eklenme Tarihi
+        `<p class="mb-0 fw-normal">${formatDate(category.createdDate)}</p>`,
+        
+        // İşlemler
+        `<div class="d-flex gap-1">
+            <button class="btn btn-outline-warning btn-sm" onclick="editCategory('${category.id}')" title="Düzenle">
+                <i class="ti ti-edit fs-6"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteCategory('${category.id}', '${escapeHtml(category.name)}')" title="Sil">
+                <i class="ti ti-trash fs-6"></i>
+            </button>
+        </div>`
+    ];
 }
 
 /**
@@ -266,17 +385,11 @@ async function handleFormSubmit(event) {
             // Başarı mesajı göster
             showNotification('Kategori başarıyla eklendi!', 'success');
 
-            // Kategoriler listesi sayfasındaysak, tabloya yeni satır ekle
-            if (categoriesTableBody && window.location.pathname.includes('categories.html')) {
-                // Boş durum varsa kaldır
-                const emptyRow = categoriesTableBody.querySelector('td[colspan]');
-                if (emptyRow) {
-                    categoriesTableBody.innerHTML = '';
-                }
-
-                // Yeni kategoriyi tablonun başına ekle
-                const newRow = createCategoryRow(newCategory);
-                categoriesTableBody.insertBefore(newRow, categoriesTableBody.firstChild);
+            // Kategoriler listesi sayfasındaysak, DataTable'a yeni satır ekle
+            if (categoriesDataTable && window.location.pathname.includes('categories.html')) {
+                // Yeni kategoriyi DataTable'a ekle
+                const newRowData = createCategoryRowData(newCategory);
+                categoriesDataTable.row.add(newRowData).draw();
             } else if (window.location.pathname.includes('add-category.html')) {
                 // Kategori ekleme sayfasındaysak, listeye yönlendir
                 setTimeout(() => {
@@ -325,15 +438,18 @@ async function deleteCategory(categoryId, categoryName) {
     try {
         await window.apiService.fetchDelete(`Categories/${categoryId}`);
         
-        // Satırı tablodan kaldır
-        const row = event.target.closest('tr');
-        if (row) {
-            row.remove();
-        }
-
-        // Tablo boşsa kontrol et
-        if (categoriesTableBody && categoriesTableBody.children.length === 0) {
-            showEmptyState();
+        // DataTable'dan satırı kaldır
+        if (categoriesDataTable) {
+            // Silinen kategoriyi DataTable'dan bul ve kaldır
+            categoriesDataTable.rows().every(function(rowIdx, tableLoop, rowLoop) {
+                const rowData = this.data();
+                // İşlemler sütunundaki kategori ID'sini kontrol et (onclick="deleteCategory('id')" içinden)
+                if (rowData[3] && rowData[3].includes(`'${categoryId}'`)) {
+                    this.remove();
+                    return false; // Döngüyü sonlandır
+                }
+            });
+            categoriesDataTable.draw();
         }
 
         showNotification('Kategori başarıyla silindi.', 'success');
@@ -406,5 +522,91 @@ window.categoriesModule = {
     handleFormSubmit,
     viewCategory,
     editCategory,
-    deleteCategory
+    deleteCategory,
+    initializeDataTable
+};
+
+// Manual export functions (fallback)
+window.copyTableData = function() {
+    if (categoriesDataTable && categoriesDataTable.buttons) {
+        categoriesDataTable.button('.buttons-copy').trigger();
+    } else {
+        // Fallback: manuel kopyalama
+        const table = document.getElementById('categories-datatable');
+        const text = Array.from(table.querySelectorAll('tbody tr')).map(row => 
+            Array.from(row.cells).slice(0, 3).map(cell => cell.textContent.trim()).join('\t')
+        ).join('\n');
+        navigator.clipboard.writeText(text).then(() => {
+            showNotification('Tablo verisi kopyalandı!', 'success');
+        });
+    }
+};
+
+window.exportToCSV = function() {
+    if (categoriesDataTable && categoriesDataTable.buttons) {
+        categoriesDataTable.button('.buttons-csv').trigger();
+    } else {
+        // Fallback: manuel CSV export
+        const table = document.getElementById('categories-datatable');
+        const rows = Array.from(table.querySelectorAll('tbody tr'));
+        const csvContent = 'Kategori Adı,Ürün Sayısı,Eklenme Tarihi\n' + 
+            rows.map(row => 
+                Array.from(row.cells).slice(0, 3).map(cell => 
+                    '"' + cell.textContent.trim().replace(/"/g, '""') + '"'
+                ).join(',')
+            ).join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'kategoriler_' + new Date().toISOString().slice(0,10) + '.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+};
+
+window.exportToExcel = function() {
+    if (categoriesDataTable && categoriesDataTable.buttons) {
+        categoriesDataTable.button('.buttons-excel').trigger();
+    } else {
+        // Fallback: CSV olarak indir (Excel açabilir)
+        exportToCSV();
+    }
+};
+
+window.exportToPDF = function() {
+    if (categoriesDataTable && categoriesDataTable.buttons) {
+        categoriesDataTable.button('.buttons-pdf').trigger();
+    } else {
+        showNotification('PDF export için tam DataTables yüklenmesi gerekiyor', 'warning');
+    }
+};
+
+window.printTable = function() {
+    if (categoriesDataTable && categoriesDataTable.buttons) {
+        categoriesDataTable.button('.buttons-print').trigger();
+    } else {
+        // Fallback: window.print()
+        const table = document.getElementById('categories-datatable').cloneNode(true);
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Kategori Listesi</title>
+                    <style>
+                        table { border-collapse: collapse; width: 100%; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f5f5f5; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Kategori Listesi</h2>
+                    ${table.outerHTML}
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    }
 };
