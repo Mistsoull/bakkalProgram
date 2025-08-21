@@ -16,6 +16,213 @@
   <title>Bakkal Dükkanı - Siparişler</title>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="../assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+  <!-- DataTables Buttons CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+  
+  <style>
+    /* DataTable Buttons Custom Styling */
+    .dt-buttons {
+      margin-bottom: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .dt-buttons .btn {
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .dt-buttons .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    @media (max-width: 768px) {
+      .dt-buttons {
+        flex-direction: column;
+      }
+      
+      .dt-buttons .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+    }
+    
+    /* DataTable Action Buttons Styling */
+    .table tbody td .btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      border: none !important;
+      background: transparent !important;
+    }
+    
+    .table tbody td .btn i {
+      font-size: 0.875rem;
+    }
+    
+    /* Action button colors without borders */
+    .table tbody td .btn-outline-success {
+      color: #198754;
+    }
+    
+    .table tbody td .btn-outline-success:hover {
+      color: #ffffff;
+      background-color: #198754 !important;
+    }
+    
+    .table tbody td .btn-outline-warning {
+      color: #ffc107;
+    }
+    
+    .table tbody td .btn-outline-warning:hover {
+      color: #000000;
+      background-color: #ffc107 !important;
+    }
+    
+    .table tbody td .btn-outline-danger {
+      color: #dc3545;
+    }
+    
+    .table tbody td .btn-outline-danger:hover {
+      color: #ffffff;
+      background-color: #dc3545 !important;
+    }
+    
+    /* Make action column wider and centered */
+    #orders-datatable tbody td:last-child {
+      min-width: 140px;
+      white-space: nowrap;
+      text-align: center;
+      vertical-align: middle;
+    }
+    
+    /* Center the action buttons container */
+    #orders-datatable tbody td:last-child .d-flex {
+      justify-content: center;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+    
+    /* Action buttons hover effects */
+    .table tbody td .btn:hover {
+      transform: scale(1.05);
+      transition: all 0.2s ease-in-out;
+    }
+    
+    /* Remove horizontal scrollbar from table */
+    .table-responsive {
+      overflow-x: hidden;
+      margin-bottom: 1rem;
+    }
+    
+    /* DataTable pagination buttons styling */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      border: none !important;
+      background: none !important;
+      padding: 0.125rem 0.25rem !important;
+      margin: 0 0.0625rem !important;
+      font-size: 0.75rem !important;
+      border-radius: 0.5rem !important;
+      min-width: 1.5rem !important;
+      height: 1.5rem !important;
+      line-height: 1 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+      border: none !important;
+      background: rgba(0, 123, 255, 0.1) !important;
+      color: #007bff !important;
+      border-radius: 0.5rem !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+      border: none !important;
+      background: rgba(0, 123, 255, 0.15) !important;
+      color: #007bff !important;
+      font-weight: bold !important;
+      border-radius: 0.5rem !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+      color: #6c757d !important;
+      opacity: 0.5 !important;
+    }
+    
+    /* Make sure table fits within container */
+    #orders-datatable {
+      width: 100% !important;
+      table-layout: fixed;
+    }
+    
+    /* Adjust column widths to prevent overflow */
+    #orders-datatable th:nth-child(1),
+    #orders-datatable td:nth-child(1) {
+      width: 25%;
+    }
+    
+    #orders-datatable th:nth-child(2),
+    #orders-datatable td:nth-child(2) {
+      width: 20%;
+    }
+    
+    #orders-datatable th:nth-child(3),
+    #orders-datatable td:nth-child(3) {
+      width: 15%;
+    }
+    
+    #orders-datatable th:nth-child(4),
+    #orders-datatable td:nth-child(4) {
+      width: 15%;
+    }
+    
+    #orders-datatable th:nth-child(5),
+    #orders-datatable td:nth-child(5) {
+      width: 15%;
+    }
+    
+    #orders-datatable th:nth-child(6),
+    #orders-datatable td:nth-child(6) {
+      width: 10%;
+    }
+    
+    /* Mobile responsive action buttons */
+    @media (max-width: 576px) {
+      #orders-datatable tbody td:last-child {
+        min-width: 120px;
+      }
+      
+      .table tbody td .btn {
+        padding: 0.125rem 0.25rem;
+        font-size: 0.6rem;
+        margin: 0 1px;
+      }
+      
+      .table tbody td .btn i {
+        font-size: 0.75rem;
+      }
+      
+      /* Stack buttons vertically on very small screens */
+      @media (max-width: 400px) {
+        #orders-datatable tbody td:last-child .d-flex {
+          flex-direction: column;
+          gap: 2px;
+        }
+        
+        #orders-datatable tbody td:last-child {
+          min-width: 80px;
+        }
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -253,7 +460,7 @@
                     </div>
                   </div>
                   <div class="table-responsive">
-                    <table class="table text-nowrap mb-0 align-middle">
+                    <table id="orders-datatable" class="table text-nowrap mb-0 align-middle">
                       <thead class="text-dark fs-4">
                         <tr>
                           <th>
@@ -271,13 +478,13 @@
                           <th>
                             <h6 class="fs-4 fw-semibold mb-0">Durum</h6>
                           </th>
-                          <th>
+                          <th class="text-center">
                             <h6 class="fs-4 fw-semibold mb-0">İşlemler</h6>
                           </th>
                         </tr>
                       </thead>
-                      <tbody id="orders-table-body">
-                        <!-- Dinamik içerik buraya gelecek -->
+                      <tbody>
+                        <!-- Orders will be loaded dynamically via JavaScript -->
                       </tbody>
                     </table>
                   </div>
@@ -376,6 +583,21 @@
   
   <!-- solar icons -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+
+  <!-- DataTables JS -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <!-- API Service -->
   <script src="../assets/js/apiService.js"></script>

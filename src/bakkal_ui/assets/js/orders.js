@@ -2,10 +2,12 @@
  * Sipariş Yönetimi Modülü
  * Clean Architecture backend entegrasyonu ile sipariş listeleme, ekleme ve silme işlemleri
  * Ürün ve müşteri entegrasyonu ile dropdown ve manuel giriş desteği
+ * DataTable entegrasyonu ile gelişmiş tablo işlevselliği
  */
 
 // DOM Element Referansları
-const ordersTableBody = document.getElementById('orders-table-body');
+let ordersTable;
+let ordersDataTable;
 const addOrderForm = document.getElementById('add-order-form');
 const orderProductNameInput = document.getElementById('order-product-name-input');
 const orderQuantityInput = document.getElementById('order-quantity-input');
@@ -27,6 +29,182 @@ const avatarImages = [
     '../assets/images/profile/user-5.jpg',
     '../assets/images/profile/user-6.jpg'
 ];
+
+/**
+ * DataTable'ı başlat
+ */
+function initializeDataTable() {
+    if (!ordersTable) return;
+    
+    try {
+        console.log('Orders DataTable başlatılıyor...');
+        console.log('jQuery sürümü:', $.fn.jquery);
+        console.log('DataTables mevcut:', !!$.fn.DataTable);
+        console.log('Buttons mevcut:', !!$.fn.DataTable.Buttons);
+        
+        ordersDataTable = $(ordersTable).DataTable({
+            responsive: true,
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            processing: true,
+            search: {
+                caseInsensitive: true
+            },
+            dom: '<"row"<"col-sm-6"B><"col-sm-6"f>>' +
+                 '<"row"<"col-sm-12"tr>>' +
+                 '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: '<i class="fas fa-copy me-1"></i>Kopyala',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4], // Müşteri, ürün, miktar, tarih, durum
+                        format: {
+                            body: function (data, row, column, node) {
+                                // HTML etiketlerini temizle
+                                return data.replace(/<.*?>/g, '').trim();
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'csv',
+                    text: '<i class="fas fa-file-csv me-1"></i>CSV',
+                    filename: 'siparisler_' + new Date().toISOString().slice(0,10),
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4],
+                        format: {
+                            body: function (data, row, column, node) {
+                                return data.replace(/<.*?>/g, '').trim();
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: '<i class="fas fa-file-excel me-1"></i>Excel',
+                    filename: 'siparisler_' + new Date().toISOString().slice(0,10),
+                    title: 'Sipariş Listesi',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4],
+                        format: {
+                            body: function (data, row, column, node) {
+                                return data.replace(/<.*?>/g, '').trim();
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: '<i class="fas fa-file-pdf me-1"></i>PDF',
+                    filename: 'siparisler_' + new Date().toISOString().slice(0,10),
+                    title: 'Sipariş Listesi',
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4],
+                        format: {
+                            body: function (data, row, column, node) {
+                                return data.replace(/<.*?>/g, '').trim();
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fas fa-print me-1"></i>Yazdır',
+                    title: 'Sipariş Listesi',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4],
+                        format: {
+                            body: function (data, row, column, node) {
+                                return data.replace(/<.*?>/g, '').trim();
+                            }
+                        }
+                    }
+                }
+            ],
+            language: {
+                "decimal": "",
+                "emptyTable": "Tabloda herhangi bir veri mevcut değil",
+                "info": "_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor",
+                "infoEmpty": "Kayıt yok",
+                "infoFiltered": "(_MAX_ kayıt içerisinden bulunan)",
+                "infoPostFix": "",
+                "thousands": ".",
+                "lengthMenu": "_MENU_ kayıt göster",
+                "loadingRecords": "Yükleniyor...",
+                "processing": "İşleniyor...",
+                "search": "Ara:",
+                "searchPlaceholder": "Arama yapın",
+                "zeroRecords": "Eşleşen kayıt bulunamadı",
+                "paginate": {
+                    "first": "İlk",
+                    "last": "Son",
+                    "next": "Sonraki",
+                    "previous": "Önceki"
+                },
+                "aria": {
+                    "sortAscending": ": artan sütun sıralamasını aktifleştir",
+                    "sortDescending": ": azalan sütun sıralamasını aktifleştir"
+                }
+            },
+            order: [[3, 'desc']], // Teslimat tarihine göre azalan sırala (en yeni üstte)
+            columnDefs: [
+                {
+                    targets: [5], // İşlemler sütunu
+                    orderable: false,
+                    searchable: false,
+                    width: "140px",
+                    className: "text-center"
+                }
+            ],
+            drawCallback: function() {
+                // DataTable yeniden çizildiğinde tooltip'leri yeniden başlat
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
+        });
+        
+        // Button stillerini uygula
+        $('.dt-buttons .btn').removeClass('dt-button').addClass('me-2 mb-2');
+        
+        console.log('Orders DataTable başarıyla başlatıldı');
+        console.log('Buttons mevcut:', !!ordersDataTable.buttons);
+        
+    } catch (error) {
+        console.error('Orders DataTable başlatılamadı:', error);
+        // Hata durumunda basit bir export butonu ekle
+        setTimeout(() => {
+            if ($('.dt-buttons').length === 0) {
+                const table = $(ordersTable);
+                const simpleButtons = `
+                    <div class="mb-3">
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="alert('Export özelliği yüklenemedi')">
+                            <i class="fas fa-download me-1"></i>Export
+                        </button>
+                    </div>
+                `;
+                table.closest('.table-responsive').before(simpleButtons);
+            }
+        }, 500);
+    }
+}
+
+/**
+ * DOM element referanslarını başlat
+ */
+function initializeElements() {
+    // DataTable tablosunu al
+    ordersTable = document.getElementById('orders-datatable');
+    
+    // DataTable'ı başlat
+    if (ordersTable) {
+        initializeDataTable();
+    }
+}
 
 /**
  * Rastgele avatar resmi döndürür
@@ -155,23 +333,19 @@ async function loadCustomersForDropdown() {
 }
 
 /**
- * API'den sipariş listesini çeker ve tabloya yerleştirir
+ * API'den sipariş listesini çeker ve DataTable'a yerleştirir
  */
 async function loadOrders() {
+    if (!ordersDataTable) {
+        console.warn('DataTable henüz başlatılmamış');
+        return;
+    }
+
     try {
         console.log('Siparişler yükleniyor...');
         
-        // Yükleniyor mesajı göster
-        ordersTableBody.innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center py-4">
-                    <div class="d-flex justify-content-center align-items-center">
-                        <div class="spinner-border text-primary me-2" role="status" aria-hidden="true"></div>
-                        <span>Siparişler yükleniyor...</span>
-                    </div>
-                </td>
-            </tr>
-        `;
+        // Yükleniyor durumunu göster
+        showLoadingState();
         
         const response = await apiService.fetchGetAll('Orders');
         
@@ -185,84 +359,116 @@ async function loadOrders() {
         
         console.log('API\'den gelen sipariş verisi:', orders);
         
-        // Tabloyu temizle
-        ordersTableBody.innerHTML = '';
-        
-        // Eğer sipariş yoksa
-        if (orders.length === 0) {
-            ordersTableBody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="text-center py-4">
-                        <i class="fas fa-inbox fs-1 text-muted mb-3"></i>
-                        <h5 class="text-muted">Henüz sipariş bulunmuyor</h5>
-                        <p class="text-muted">İlk siparişinizi eklemek için "Yeni Sipariş Ekle" butonunu kullanın.</p>
-                    </td>
-                </tr>
-            `;
-            return;
+        // DataTable'ı temizle
+        ordersDataTable.clear();
+
+        if (orders && orders.length > 0) {
+            // Her sipariş için satır verisi oluştur ve tabloya ekle
+            orders.forEach(order => {
+                const rowData = createOrderRowData(order);
+                ordersDataTable.row.add(rowData);
+            });
+        } else {
+            showEmptyState();
         }
-        
-        // Her sipariş için tablo satırı oluştur
-        orders.forEach(order => {
-            const avatarImg = getRandomAvatar();
-            const fullCustomerName = order.customerSurname ? 
-                `${order.customerName} ${order.customerSurname}` : 
-                order.customerName;
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>
-                    <div class="d-flex align-items-center">
-                        <img src="${avatarImg}" class="rounded-circle" width="40" height="40" alt="Customer Avatar">
-                        <div class="ms-3">
-                            <h6 class="fs-4 fw-semibold mb-0">${escapeHtml(fullCustomerName)}</h6>
-                            <span class="fw-normal text-muted">Müşteri</span>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <p class="mb-0 fw-normal">${escapeHtml(order.productName)}</p>
-                </td>
-                <td>
-                    <span class="badge bg-info-subtle text-info">${order.quantity} adet</span>
-                </td>
-                <td>
-                    <p class="mb-0 fw-normal">${formatDate(order.deliveryDate)}</p>
-                </td>
-                <td>
-                    ${getStatusBadge(order.isDelivered)}
-                </td>
-                <td>
-                    <div class="d-flex justify-content-center gap-1">
-                        <button class="btn btn-outline-success btn-sm" onclick="toggleOrderStatus('${order.id}', ${!order.isDelivered})" title="${order.isDelivered ? 'Bekliyor Yap' : 'Teslim Et'}">
-                            <i class="fas fa-${order.isDelivered ? 'undo' : 'check'}"></i>
-                        </button>
-                        <button class="btn btn-outline-danger btn-sm delete-btn" data-id="${order.id}" title="Sil">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            `;
-            
-            ordersTableBody.appendChild(row);
-        });
+
+        // DataTable'ı yeniden çiz
+        ordersDataTable.draw();
         
         console.log(`${orders.length} sipariş başarıyla yüklendi.`);
         
     } catch (error) {
         console.error('Siparişler yüklenirken hata:', error);
-        ordersTableBody.innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center py-4">
-                    <i class="fas fa-exclamation-triangle fs-1 text-danger mb-3"></i>
-                    <h5 class="text-danger">Hata!</h5>
-                    <p class="text-muted">Siparişler yüklenirken bir hata oluştu: ${error.message}</p>
-                    <button class="btn btn-primary" onclick="loadOrders()">Tekrar Dene</button>
-                </td>
-            </tr>
-        `;
-        showToast('error', 'Hata!', 'Siparişler yüklenirken bir hata oluştu: ' + error.message);
+        console.error('Hata detayları:', {
+            message: error.message,
+            stack: error.stack,
+            url: `${window.apiService ? 'API Servisi mevcut' : 'API Servisi mevcut değil'}`
+        });
+        showErrorState();
+        // Kullanıcı dostu hata mesajı göster
+        showToast('error', 'Hata!', `Siparişler yüklenirken bir hata oluştu: ${error.message}`);
     }
+}
+
+/**
+ * DataTable için yükleniyor durumunu göster
+ */
+function showLoadingState() {
+    if (!ordersDataTable) return;
+    
+    try {
+        // DataTable için loading processing özelliğini kullan
+        ordersDataTable.processing(true);
+    } catch (error) {
+        console.warn('DataTable processing durumu ayarlanamadı:', error);
+    }
+}
+
+/**
+ * DataTable için boş durum göster (DataTable otomatik olarak halleder)
+ */
+function showEmptyState() {
+    // DataTable otomatik olarak "No data available" mesajı gösterir
+    console.log('Henüz sipariş bulunmuyor');
+}
+
+/**
+ * DataTable için hata durumu göster
+ */
+function showErrorState() {
+    if (!ordersDataTable) return;
+    
+    // DataTable'ı temizle ve hata mesajı göster
+    ordersDataTable.clear().draw();
+    showToast('error', 'Hata!', 'Veri yüklenirken hata oluştu. Lütfen internet bağlantınızı kontrol edin ve sayfayı yenileyin.');
+}
+
+/**
+ * DataTable için sipariş satır verisi oluştur
+ * @param {Object} order - API'den gelen sipariş verisi
+ * @returns {Array} - DataTable satır verisi
+ */
+function createOrderRowData(order) {
+    // Debug: Sipariş verisini logla
+    console.log('Sipariş verisi:', order);
+    
+    const avatarImg = getRandomAvatar();
+    const fullCustomerName = order.customerSurname ? 
+        `${order.customerName} ${order.customerSurname}` : 
+        order.customerName;
+
+    return [
+        // Müşteri Adı Soyadı
+        `<div class="d-flex align-items-center">
+            <img src="${avatarImg}" class="rounded-circle" width="40" height="40" alt="Customer Avatar">
+            <div class="ms-3">
+                <h6 class="fs-4 fw-semibold mb-0">${escapeHtml(fullCustomerName)}</h6>
+                <span class="fw-normal text-muted">Müşteri</span>
+            </div>
+        </div>`,
+        
+        // Ürün
+        `<p class="mb-0 fw-normal">${escapeHtml(order.productName)}</p>`,
+        
+        // Miktar
+        `<span class="badge bg-info-subtle text-info">${order.quantity} adet</span>`,
+        
+        // Teslimat Tarihi
+        `<p class="mb-0 fw-normal">${formatDate(order.deliveryDate)}</p>`,
+        
+        // Durum
+        `${getStatusBadge(order.isDelivered)}`,
+        
+        // İşlemler
+        `<div class="d-flex justify-content-center gap-1">
+            <button class="btn btn-outline-success btn-sm" onclick="toggleOrderStatus('${order.id}', ${!order.isDelivered})" title="${order.isDelivered ? 'Bekliyor Yap' : 'Teslim Et'}">
+                <i class="fas fa-${order.isDelivered ? 'undo' : 'check'}"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteOrder('${order.id}', '${escapeHtml(fullCustomerName)}')" title="Sil">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>`
+    ];
 }
 
 /**
@@ -321,8 +527,11 @@ function handleAddOrderForm(event) {
         .then(response => {
             console.log('Sipariş başarıyla eklendi:', response);
             
-            // Yeni siparişi tabloya ekle
-            addOrderToTable(response);
+            // DataTable'a yeni siparişi ekle
+            if (ordersDataTable) {
+                const newRowData = createOrderRowData(response);
+                ordersDataTable.row.add(newRowData).draw(false);
+            }
             
             // Formu temizle ve modalı kapat
             addOrderForm.reset();
@@ -351,59 +560,124 @@ function handleAddOrderForm(event) {
 }
 
 /**
- * Yeni siparişi tabloya ekler
+ * Onaylamalı sipariş silme
+ * @param {string} orderId - Sipariş ID'si (Guid)
+ * @param {string} customerName - Onay için müşteri adı
  */
-function addOrderToTable(order) {
-    // Eğer tablo boşsa, placeholder'ı kaldır
-    if (ordersTableBody.innerHTML.includes('Henüz sipariş bulunmuyor') || 
-        ordersTableBody.innerHTML.includes('Siparişler yükleniyor')) {
-        ordersTableBody.innerHTML = '';
+async function deleteOrder(orderId, customerName) {
+    // SweetAlert2 kullanılabilirse modern onay penceresi, yoksa standart confirm
+    let confirmed = false;
+    
+    if (typeof Swal !== 'undefined') {
+        const result = await Swal.fire({
+            title: 'Sipariş Silme Onayı',
+            html: `<strong>"${customerName}"</strong> müşterisinin siparişini silmek istediğinizden emin misiniz?<br><br><small class="text-muted">Bu işlem geri alınamaz.</small>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-trash me-2"></i>Evet, Sil',
+            cancelButtonText: '<i class="fas fa-times me-2"></i>İptal',
+            reverseButtons: true,
+            focusCancel: true
+        });
+        confirmed = result.isConfirmed;
+    } else {
+        // Fallback: Standart browser confirm
+        confirmed = confirm(`"${customerName}" müşterisinin siparişini silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.`);
     }
     
-    const avatarImg = getRandomAvatar();
-    const fullCustomerName = order.customerSurname ? 
-        `${order.customerName} ${order.customerSurname}` : 
-        order.customerName;
-    
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>
-            <div class="d-flex align-items-center">
-                <img src="${avatarImg}" class="rounded-circle" width="40" height="40" alt="Customer Avatar">
-                <div class="ms-3">
-                    <h6 class="fs-4 fw-semibold mb-0">${escapeHtml(fullCustomerName)}</h6>
-                    <span class="fw-normal text-muted">Müşteri</span>
-                </div>
-            </div>
-        </td>
-        <td>
-            <p class="mb-0 fw-normal">${escapeHtml(order.productName)}</p>
-        </td>
-        <td>
-            <span class="badge bg-info-subtle text-info">${order.quantity} adet</span>
-        </td>
-        <td>
-            <p class="mb-0 fw-normal">${formatDate(order.deliveryDate)}</p>
-        </td>
-        <td>
-            ${getStatusBadge(order.isDelivered)}
-        </td>
-        <td>
-            <div class="d-flex justify-content-center gap-1">
-                <button class="btn btn-outline-success btn-sm" onclick="toggleOrderStatus('${order.id}', ${!order.isDelivered})" title="${order.isDelivered ? 'Bekliyor Yap' : 'Teslim Et'}">
-                    <i class="fas fa-${order.isDelivered ? 'undo' : 'check'}"></i>
-                </button>
-                <button class="btn btn-outline-danger btn-sm delete-btn" data-id="${order.id}" title="Sil">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        </td>
-    `;
-    
-    // Yeni satırı tablonun başına ekle
-    ordersTableBody.insertBefore(row, ordersTableBody.firstChild);
-}
+    if (!confirmed) return;
 
+    try {
+        // Loading bildirimi göster
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Siliniyor...',
+                text: 'Sipariş siliniyor, lütfen bekleyin.',
+                icon: 'info',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+        
+        // API'ye DELETE isteği gönder
+        await apiService.fetchDelete(`Orders/${orderId}`);
+        
+        console.log(`Sipariş silindi: ${orderId} - ${customerName}`);
+        
+        // Başarı bildirimi
+        if (typeof Swal !== 'undefined') {
+            await Swal.fire({
+                title: 'Başarılı!',
+                text: `"${customerName}" müşterisinin siparişi başarıyla silindi.`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } else {
+            showToast('success', 'Başarılı!', 'Sipariş başarıyla silindi!');
+        }
+        
+        // DataTable'dan satırı kaldır
+        if (ordersDataTable) {
+            // Silinen siparişin satırını bul ve kaldır
+            const table = ordersDataTable;
+            let rowRemoved = false;
+            
+            table.rows().every(function(rowIdx, tableLoop, rowLoop) {
+                const rowData = this.data();
+                // İşlemler sütunundaki butonlardan ID'yi çek
+                if (rowData[5] && rowData[5].includes(orderId)) {
+                    this.remove();
+                    rowRemoved = true;
+                    return false; // Loop'u durdur
+                }
+            });
+            
+            if (rowRemoved) {
+                table.draw(false); // Sayfa numarasını koruyarak yeniden çiz
+                console.log('Sipariş tablodan kaldırıldı');
+            } else {
+                console.warn('Silinecek sipariş tabloda bulunamadı, tabloyu yeniliyoruz');
+                // Bulunamazsa tüm tabloyu yenile
+                loadOrders();
+            }
+        }
+        
+    } catch (error) {
+        console.error('Sipariş silinemedi:', error);
+        
+        // Hata türüne göre mesaj belirle
+        let errorMessage = 'Sipariş silinirken bir hata oluştu.';
+        
+        if (error.message.includes('404')) {
+            errorMessage = 'Sipariş bulunamadı. Sayfa yenilenecek.';
+            // 404 durumunda tabloyu yenile
+            setTimeout(() => loadOrders(), 2000);
+        } else if (error.message.includes('403')) {
+            errorMessage = 'Bu işlem için yetkiniz yok.';
+        } else if (error.message.includes('500')) {
+            errorMessage = 'Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.';
+        }
+        
+        // Hata bildirimi
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Hata!',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'Tamam'
+            });
+        } else {
+            showToast('error', 'Hata!', errorMessage);
+        }
+    }
+}
 /**
  * Sipariş durumunu değiştirir (Teslim Et / Bekliyor Yap)
  */
@@ -441,7 +715,7 @@ async function toggleOrderStatus(orderId, newStatus) {
         
         console.log('Sipariş durumu başarıyla güncellendi:', orderId, newStatus);
         
-        // Sayfayı yeniden yükle (gerçek uygulamada sadece ilgili satırı güncelleyebiliriz)
+        // DataTable'ı yeniden yükle (gerçek uygulamada sadece ilgili satırı güncelleyebiliriz)
         loadOrders();
         
         showToast('success', 'Başarılı!', `Sipariş durumu "${statusText}" olarak güncellendi.`);
@@ -450,56 +724,6 @@ async function toggleOrderStatus(orderId, newStatus) {
         console.error('Sipariş durumu güncellenirken hata:', error);
         showToast('error', 'Hata!', 'Sipariş durumu güncellenirken bir hata oluştu: ' + error.message);
     }
-}
-
-/**
- * Sipariş silme fonksiyonu (Event Delegation ile)
- */
-function handleDeleteOrder(event) {
-    if (!event.target.closest('.delete-btn')) return;
-    
-    const button = event.target.closest('.delete-btn');
-    const orderId = button.dataset.id;
-    
-    if (!orderId) {
-        console.error('Sipariş ID bulunamadı');
-        return;
-    }
-    
-    // Kullanıcıdan onay al
-    if (!confirm('Bu siparişi silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.')) {
-        return;
-    }
-    
-    // API'ye DELETE isteği gönder
-    apiService.fetchDelete(`Orders/${orderId}`)
-        .then(() => {
-            console.log('Sipariş başarıyla silindi:', orderId);
-            
-            // Satırı tablodan kaldır
-            const row = button.closest('tr');
-            row.remove();
-            
-            // Eğer tablo boş kaldıysa placeholder göster
-            if (ordersTableBody.children.length === 0) {
-                ordersTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="text-center py-4">
-                            <i class="fas fa-inbox fs-1 text-muted mb-3"></i>
-                            <h5 class="text-muted">Henüz sipariş bulunmuyor</h5>
-                            <p class="text-muted">İlk siparişinizi eklemek için "Yeni Sipariş Ekle" butonunu kullanın.</p>
-                        </td>
-                    </tr>
-                `;
-            }
-            
-            // Başarı mesajı göster
-            showToast('success', 'Başarılı!', 'Sipariş başarıyla silindi.');
-        })
-        .catch(error => {
-            console.error('Sipariş silinirken hata:', error);
-            showToast('error', 'Hata!', 'Sipariş silinirken bir hata oluştu: ' + error.message);
-        });
 }
 
 /**
@@ -622,8 +846,8 @@ function initializeOrdersPage() {
         return;
     }
     
-    if (!ordersTableBody) {
-        console.error('Tablo tbody elementi bulunamadı');
+    if (!ordersTable) {
+        console.error('DataTable elementi bulunamadı');
         return;
     }
     
@@ -654,9 +878,6 @@ function initializeOrdersPage() {
     // Form submit olayını dinle
     addOrderForm.addEventListener('submit', handleAddOrderForm);
     
-    // Silme işlemi için event delegation
-    ordersTableBody.addEventListener('click', handleDeleteOrder);
-    
     // Dropdown handler'larını ayarla
     setupDropdownHandlers();
     
@@ -669,9 +890,19 @@ function initializeOrdersPage() {
     console.log('Siparişler sayfası başarıyla başlatıldı.');
 }
 
-// Sayfa yüklendiğinde çalıştır
+// DOM yüklendiğinde başlat
 document.addEventListener('DOMContentLoaded', function() {
-    initializeOrdersPage();
+    // jQuery ve DataTables yüklenene kadar bekle
+    function waitForDependencies() {
+        if (typeof $ === 'undefined' || typeof $.fn.DataTable === 'undefined' || typeof $.fn.DataTable.Buttons === 'undefined') {
+            setTimeout(waitForDependencies, 100);
+        } else {
+            initializeElements();
+            initializeOrdersPage();
+        }
+    }
+    
+    waitForDependencies();
 });
 
 // Global erişim için window objesine ekle (debugging için)
@@ -679,8 +910,53 @@ window.ordersModule = {
     loadOrders,
     loadProductsForDropdown,
     loadCustomersForDropdown,
-    addOrderToTable,
     toggleOrderStatus,
+    deleteOrder,
     formatDate,
-    getStatusBadge
+    getStatusBadge,
+    initializeDataTable
+};
+
+// XSS'i önlemek için HTML kaçış fonksiyonu global olarak erişilebilir hale getir
+window.escapeHtml = escapeHtml;
+
+// Manual export functions (fallback)
+window.copyTableData = function() {
+    if (ordersDataTable && ordersDataTable.buttons) {
+        ordersDataTable.button('copy').trigger();
+    } else {
+        showToast('error', 'Hata!', 'Kopyalama özelliği yüklenemedi.');
+    }
+};
+
+window.exportToCSV = function() {
+    if (ordersDataTable && ordersDataTable.buttons) {
+        ordersDataTable.button('csv').trigger();
+    } else {
+        showToast('error', 'Hata!', 'CSV export özelliği yüklenemedi.');
+    }
+};
+
+window.exportToExcel = function() {
+    if (ordersDataTable && ordersDataTable.buttons) {
+        ordersDataTable.button('excel').trigger();
+    } else {
+        showToast('error', 'Hata!', 'Excel export özelliği yüklenemedi.');
+    }
+};
+
+window.exportToPDF = function() {
+    if (ordersDataTable && ordersDataTable.buttons) {
+        ordersDataTable.button('pdf').trigger();
+    } else {
+        showToast('error', 'Hata!', 'PDF export özelliği yüklenemedi.');
+    }
+};
+
+window.printTable = function() {
+    if (ordersDataTable && ordersDataTable.buttons) {
+        ordersDataTable.button('print').trigger();
+    } else {
+        showToast('error', 'Hata!', 'Yazdırma özelliği yüklenemedi.');
+    }
 };
