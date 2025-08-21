@@ -406,7 +406,7 @@
                 <form id="productForm">
                   <div class="card-body">
                     <div class="row">
-                      <div class="col-md-6">
+                      <div class="col-md-4">
                         <div class="form-floating mb-3">
                           <input type="text" class="form-control" id="productName" name="name" placeholder="Ürün adını giriniz" required>
                           <label for="productName">
@@ -417,18 +417,22 @@
                           Lütfen ürün adını giriniz.
                         </div>
                       </div>
-                      <div class="col-md-6">
+                      <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                          <input type="number" class="form-control" id="productPrice" name="price" placeholder="Ürün fiyatını giriniz" min="0" step="0.01" required>
+                          <label for="productPrice">
+                            <i class="ti ti-currency-lira me-2 fs-4"></i>Fiyat (₺) *
+                          </label>
+                        </div>
+                        <div class="invalid-feedback">
+                          Lütfen geçerli bir fiyat giriniz.
+                        </div>
+                      </div>
+                      <div class="col-md-4">
                         <div class="form-floating mb-3">
                           <select class="form-select" id="productCategory" name="categoryId" required>
                             <option value="" disabled selected>Kategori seçiniz...</option>
-                            <option value="cat-1">İçecekler</option>
-                            <option value="cat-2">Atıştırmalıklar</option>
-                            <option value="cat-3">Hediyelik Eşyalar</option>
-                            <option value="cat-4">Kişisel Bakım</option>
-                            <option value="cat-5">İlaç & Sağlık</option>
-                            <option value="cat-6">Elektronik</option>
-                            <option value="cat-7">Giyim & Aksesuar</option>
-                            <option value="cat-8">Kitap & Dergi</option>
+                            <!-- Kategoriler dinamik olarak yüklenecek -->
                           </select>
                           <label for="productCategory">
                             <i class="ti ti-category me-2 fs-4"></i>Kategori *
@@ -532,105 +536,11 @@
   <script src="../assets/js/theme/app.min.js"></script>
   <script src="../assets/js/theme/sidebarmenu.js"></script>
 
-  <!-- Custom Form Validation -->
-  <script>
-    // Form validation
-    document.getElementById('productForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const form = this;
-      const productName = document.getElementById('productName');
-      const productCategory = document.getElementById('productCategory');
-      
-      let isValid = true;
-      
-      // Reset validation state
-      form.classList.remove('was-validated');
-      [productName, productCategory].forEach(field => {
-        field.classList.remove('is-invalid', 'is-valid');
-      });
-      
-      // Validate product name
-      if (!productName.value.trim()) {
-        productName.classList.add('is-invalid');
-        isValid = false;
-      } else {
-        productName.classList.add('is-valid');
-      }
-      
-      // Validate category selection
-      if (!productCategory.value) {
-        productCategory.classList.add('is-invalid');
-        isValid = false;
-      } else {
-        productCategory.classList.add('is-valid');
-      }
-      
-      if (!isValid) {
-        // Focus on first invalid field
-        const firstInvalid = form.querySelector('.is-invalid');
-        if (firstInvalid) firstInvalid.focus();
-        return;
-      }
-      
-      // If validation passes
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
-      
-      submitBtn.innerHTML = '<i class="ti ti-loader-2 me-2 spin"></i>Kaydediliyor...';
-      submitBtn.disabled = true;
-      
-      setTimeout(() => {
-        alert('Ürün başarıyla kaydedildi!');
-        // Redirect to products list
-        window.location.href = 'products.html';
-      }, 1000);
-    });
-    
-    // Real-time validation for product name
-    document.getElementById('productName').addEventListener('input', function() {
-      if (this.value.trim()) {
-        this.classList.remove('is-invalid');
-        this.classList.add('is-valid');
-      } else {
-        this.classList.remove('is-valid');
-      }
-    });
-    
-    // Real-time validation for category
-    document.getElementById('productCategory').addEventListener('change', function() {
-      if (this.value) {
-        this.classList.remove('is-invalid');
-        this.classList.add('is-valid');
-      } else {
-        this.classList.remove('is-valid');
-      }
-    });
-    
-    // Reset form functionality
-    document.querySelector('button[type="reset"]').addEventListener('click', function() {
-      // Reset validation classes after a brief delay
-      setTimeout(() => {
-        document.querySelectorAll('.is-valid, .is-invalid').forEach(field => {
-          field.classList.remove('is-valid', 'is-invalid');
-        });
-      }, 100);
-    });
-    
-    // Add some style for spinner
-    const style = document.createElement('style');
-    style.textContent = `
-      .spin {
-        animation: spin 1s linear infinite;
-      }
-      
-      @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-    `;
-    document.head.appendChild(style);
-  </script>
+  <!-- API Service -->
+  <script src="../assets/js/apiService.js"></script>
+  
+  <!-- Product Add JS -->
+  <script src="../assets/js/product-add.js"></script>
 </body>
 
 </html>

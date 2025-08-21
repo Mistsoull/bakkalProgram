@@ -247,9 +247,9 @@
                       <h5 class="card-title fw-semibold">Sipariş Listesi</h5>
                     </div>
                     <div>
-                      <a href="add-order.html" class="btn btn-primary">
+                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOrderModal">
                         <i class="fas fa-plus me-2"></i>Yeni Sipariş Ekle
-                      </a>
+                      </button>
                     </div>
                   </div>
                   <div class="table-responsive">
@@ -257,7 +257,7 @@
                       <thead class="text-dark fs-4">
                         <tr>
                           <th>
-                            <h6 class="fs-4 fw-semibold mb-0">Sipariş Veren</h6>
+                            <h6 class="fs-4 fw-semibold mb-0">Müşteri Adı Soyadı</h6>
                           </th>
                           <th>
                             <h6 class="fs-4 fw-semibold mb-0">Ürün</h6>
@@ -276,281 +276,88 @@
                           </th>
                         </tr>
                       </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-2.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Ahmet Yılmaz</h6>
-                                <span class="fw-normal">Otel Çalışanı</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Ekmek</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-info-subtle text-info">5 adet</span>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">16/01/2024</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-warning-subtle text-warning">Bekliyor</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-edit"></i>Düzenle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-check"></i>Teslim Et
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-x"></i>İptal Et
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-trash"></i>Sil
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-3.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Ayşe Kaya</h6>
-                                <span class="fw-normal">Müşteri</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Özel Gazete</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-info-subtle text-info">1 adet</span>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">16/01/2024</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-success-subtle text-success">Teslim Edildi</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-edit"></i>Düzenle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-receipt"></i>Fatura Yazdır
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-trash"></i>Sil
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-4.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Mehmet Özkan</h6>
-                                <span class="fw-normal">Otel Çalışanı</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Çikolata</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-info-subtle text-info">3 adet</span>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">16/01/2024</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-warning-subtle text-warning">Bekliyor</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-edit"></i>Düzenle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-check"></i>Teslim Et
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-x"></i>İptal Et
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-trash"></i>Sil
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-5.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Fatma Demir</h6>
-                                <span class="fw-normal">Müşteri</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Su (1.5L)</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-info-subtle text-info">10 adet</span>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">17/01/2024</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-primary-subtle text-primary">Hazırlanıyor</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-edit"></i>Düzenle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-check"></i>Teslim Et
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-x"></i>İptal Et
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-trash"></i>Sil
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-6.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Ali Vural</h6>
-                                <span class="fw-normal">Otel Çalışanı</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Gazete</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-info-subtle text-info">2 adet</span>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">15/01/2024</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-danger-subtle text-danger">İptal Edildi</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-refresh"></i>Yeniden Aktifleştir
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-trash"></i>Sil
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
+                      <tbody id="orders-table-body">
+                        <!-- Dinamik içerik buraya gelecek -->
                       </tbody>
                     </table>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Order Modal -->
+          <div class="modal fade" id="addOrderModal" tabindex="-1" aria-labelledby="addOrderModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="addOrderModalLabel">
+                    <i class="fas fa-plus me-2"></i>Yeni Sipariş Ekle
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="add-order-form">
+                  <div class="modal-body">
+                    <div class="row">
+                      <!-- Ürün Seçimi -->
+                      <div class="col-md-6 mb-3">
+                        <label for="order-product-select" class="form-label">Ürün Seç (Opsiyonel)</label>
+                        <select class="form-select" id="order-product-select">
+                          <option value="">Ürün Seç (Opsiyonel)</option>
+                        </select>
+                      </div>
+                      
+                      <!-- Ürün Adı Manuel Giriş -->
+                      <div class="col-md-6 mb-3">
+                        <label for="order-product-name-input" class="form-label">Ürün Adı <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="order-product-name-input" placeholder="Ürün adını giriniz" required>
+                        <div class="form-text">Yukarıdan seçim yaparsanız otomatik doldurulur</div>
+                      </div>
+                      
+                      <!-- Miktar -->
+                      <div class="col-md-6 mb-3">
+                        <label for="order-quantity-input" class="form-label">Miktar <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="order-quantity-input" placeholder="Miktar giriniz" min="1" required>
+                      </div>
+                      
+                      <!-- Müşteri Seçimi -->
+                      <div class="col-md-6 mb-3">
+                        <label for="order-customer-select" class="form-label">Müşteri Seç (Opsiyonel)</label>
+                        <select class="form-select" id="order-customer-select">
+                          <option value="">Müşteri Seç (Opsiyonel)</option>
+                        </select>
+                      </div>
+                      
+                      <!-- Müşteri Adı Manuel Giriş -->
+                      <div class="col-md-6 mb-3">
+                        <label for="order-customer-name-input" class="form-label">Müşteri Adı <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="order-customer-name-input" placeholder="Müşteri adını giriniz" required>
+                        <div class="form-text">Yukarıdan seçim yaparsanız otomatik doldurulur</div>
+                      </div>
+                      
+                      <!-- Müşteri Soyadı Manuel Giriş -->
+                      <div class="col-md-6 mb-3">
+                        <label for="order-customer-surname-input" class="form-label">Müşteri Soyadı</label>
+                        <input type="text" class="form-control" id="order-customer-surname-input" placeholder="Müşteri soyadını giriniz">
+                        <div class="form-text">Yukarıdan seçim yaparsanız otomatik doldurulur</div>
+                      </div>
+                      
+                      <!-- Teslimat Tarihi -->
+                      <div class="col-md-6 mb-3">
+                        <label for="order-delivery-date-input" class="form-label">Teslimat Tarihi <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="order-delivery-date-input" required>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                      <i class="fas fa-times me-2"></i>İptal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="fas fa-save me-2"></i>Siparişi Kaydet
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -569,6 +376,12 @@
   
   <!-- solar icons -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+  
+  <!-- API Service -->
+  <script src="../assets/js/apiService.js"></script>
+  
+  <!-- Orders Page Script -->
+  <script src="../assets/js/orders.js"></script>
 </body>
 
 </html>

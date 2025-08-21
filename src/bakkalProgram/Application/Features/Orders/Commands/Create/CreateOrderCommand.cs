@@ -11,6 +11,7 @@ public class CreateOrderCommand : IRequest<CreatedOrderResponse>
     public required string ProductName { get; set; }
     public required int Quantity { get; set; }
     public required string CustomerName { get; set; }
+    public string? CustomerSurname { get; set; }
     public required DateTime DeliveryDate { get; set; }
     public Guid? ProductId { get; set; }
     public Guid? CustomerId { get; set; }

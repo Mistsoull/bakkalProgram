@@ -11,8 +11,11 @@ public class OnCreditConfiguration : IEntityTypeConfiguration<OnCredit>
         builder.ToTable("OnCredits").HasKey(oc => oc.Id);
 
         builder.Property(oc => oc.Id).HasColumnName("Id").IsRequired();
-        builder.Property(oc => oc.EmployeeName).HasColumnName("EmployeeName").IsRequired();
-        builder.Property(oc => oc.Note).HasColumnName("Note").IsRequired();
+        builder.Property(oc => oc.EmployeeName).HasColumnName("EmployeeName");
+        builder.Property(oc => oc.EmployeeSurname).HasColumnName("EmployeeSurname");
+        builder.Property(oc => oc.CustomerName).HasColumnName("CustomerName");
+        builder.Property(oc => oc.CustomerSurname).HasColumnName("CustomerSurname");
+        builder.Property(oc => oc.Note).HasColumnName("Note");
         builder.Property(oc => oc.IsPaid).HasColumnName("IsPaid").IsRequired();
         builder.Property(oc => oc.TotalAmount).HasColumnName("TotalAmount").IsRequired();
         builder.Property(oc => oc.EmployeeId).HasColumnName("EmployeeId");

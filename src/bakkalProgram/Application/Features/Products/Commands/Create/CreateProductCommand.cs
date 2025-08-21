@@ -9,6 +9,7 @@ namespace Application.Features.Products.Commands.Create;
 public class CreateProductCommand : IRequest<CreatedProductResponse>
 {
     public required string Name { get; set; }
+    public required double Price { get; set; }
     public required Guid CategoryId { get; set; }
 
     public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, CreatedProductResponse>

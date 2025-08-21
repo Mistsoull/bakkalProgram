@@ -145,6 +145,17 @@ namespace Persistence.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("CreatedDate");
 
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CustomerName");
+
+                    b.Property<string>("CustomerSurname")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CustomerSurname");
+
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("DeletedDate");
@@ -154,16 +165,18 @@ namespace Persistence.Migrations
                         .HasColumnName("EmployeeId");
 
                     b.Property<string>("EmployeeName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("EmployeeName");
+
+                    b.Property<string>("EmployeeSurname")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("EmployeeSurname");
 
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit")
                         .HasColumnName("IsPaid");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Note");
 
@@ -176,6 +189,8 @@ namespace Persistence.Migrations
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("EmployeeId");
 
@@ -201,6 +216,10 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("CustomerName");
+
+                    b.Property<string>("CustomerSurname")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CustomerSurname");
 
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2")
@@ -264,6 +283,10 @@ namespace Persistence.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Name");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("Price");
+
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("UpdatedDate");
@@ -277,9 +300,15 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.OnCredit", b =>
                 {
+                    b.HasOne("Domain.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId");
+
                     b.HasOne("Domain.Entities.Employee", "Employee")
                         .WithMany("OnCredits")
                         .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Customer");
 
                     b.Navigation("Employee");
                 });

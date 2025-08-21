@@ -1,0 +1,5 @@
+Sidebar 
+    Siparişler altında Bekleyen ve Teslim edilen siparişler sekmesi yer alacak. Siparişler tıklanabilir olacak ve bekleyen siparişlere yönlendirecek.
+
+Order Entity
+    Parası ödendi bool değer eklenecek    

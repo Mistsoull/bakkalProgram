@@ -14,6 +14,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.ProductName).HasColumnName("ProductName").IsRequired();
         builder.Property(o => o.Quantity).HasColumnName("Quantity").IsRequired();
         builder.Property(o => o.CustomerName).HasColumnName("CustomerName").IsRequired();
+        builder.Property(o => o.CustomerSurname).HasColumnName("CustomerSurname");
         builder.Property(o => o.DeliveryDate).HasColumnName("DeliveryDate").IsRequired();
         builder.Property(o => o.IsDelivered).HasColumnName("IsDelivered").IsRequired();
         builder.Property(o => o.ProductId).HasColumnName("ProductId");

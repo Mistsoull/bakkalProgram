@@ -1,0 +1,2 @@
+dotnet ef migrations add OnCreditChanges --project bakkalProgram\Persistence --startup-project bakkalProgram\WebApi   
+dotnet ef database update --project bakkalProgram\Persistence --startup-project bakkalProgram\WebApi  

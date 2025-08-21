@@ -12,10 +12,92 @@
 
   <!-- Core Css -->
   <link rel="stylesheet" href="../assets/css/styles.css">
+  
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="../assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
 
   <title>Bakkal Dükkanı - Müşteriler</title>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Custom DataTable Styles -->
+  <style>
+    /* Export butonları arasına boşluk ekle */
+    .dt-buttons .btn {
+      margin-right: 8px !important;
+      margin-bottom: 4px !important;
+    }
+    
+    .dt-buttons .btn:last-child {
+      margin-right: 0 !important;
+    }
+    
+    /* Sayfalama butonları stilini düzenle */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      padding: 4px 8px !important;
+      margin: 0 2px !important;
+      border: none !important;
+      background: none !important;
+      font-size: 0.85rem !important;
+      min-width: auto !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+      background: var(--bs-primary) !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 4px !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+      background: var(--bs-primary) !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 4px !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+      color: #6c757d !important;
+      background: none !important;
+      border: none !important;
+    }
+    
+    /* İşlemler sütunundaki butonlar */
+    #customers-datatable tbody td:last-child .btn {
+      border: none !important;
+      padding: 6px 10px !important;
+      font-size: 0.85rem !important;
+      min-width: 32px !important;
+    }
+    
+    /* Responsive düzenlemeler */
+    @media (max-width: 768px) {
+      .dt-buttons {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      
+      .dt-buttons .btn {
+        margin: 2px !important;
+        font-size: 0.8rem !important;
+        padding: 4px 8px !important;
+      }
+      
+      #customers-datatable tbody td:last-child .btn {
+        padding: 5px 8px !important;
+        min-width: 30px !important;
+      }
+      
+      #customers-datatable tbody td:last-child .d-flex {
+        flex-direction: column;
+        gap: 2px;
+      }
+      
+      #customers-datatable tbody td:last-child {
+        min-width: 80px;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -247,13 +329,13 @@
                       <h5 class="card-title fw-semibold">Müşteri Listesi</h5>
                     </div>
                     <div>
-                      <a href="add-customer.html" class="btn btn-primary">
+                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
                         <i class="fas fa-plus me-2"></i>Yeni Müşteri Ekle
-                      </a>
+                      </button>
                     </div>
                   </div>
                   <div class="table-responsive">
-                    <table class="table text-nowrap mb-0 align-middle">
+                    <table id="customers-datatable" class="table text-nowrap mb-0 align-middle">
                       <thead class="text-dark fs-4">
                         <tr>
                           <th>
@@ -268,261 +350,79 @@
                           <th>
                             <h6 class="fs-4 fw-semibold mb-0">Durum</h6>
                           </th>
-                          <th>
+                          <th class="text-center">
                             <h6 class="fs-4 fw-semibold mb-0">İşlemler</h6>
                           </th>
                         </tr>
                       </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-2.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Ayşe Kaya</h6>
-                                <span class="fw-normal">Premium Müşteri</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">0532 123 4567</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Sadık müşteri, özel indirim</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-success-subtle text-success">Aktif</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-edit"></i>Düzenle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-phone"></i>Ara
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-trash"></i>Sil
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-3.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Mehmet Özkan</h6>
-                                <span class="fw-normal">Standart Müşteri</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">0541 987 6543</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Haftada 2-3 kez gelir</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-success-subtle text-success">Aktif</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-edit"></i>Düzenle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-phone"></i>Ara
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-trash"></i>Sil
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-4.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Fatma Demir</h6>
-                                <span class="fw-normal">VIP Müşteri</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">0505 456 7890</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Büyük siparişler verir</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-warning-subtle text-warning">Beklemede</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-edit"></i>Düzenle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-phone"></i>Ara
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-trash"></i>Sil
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-5.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Ali Vural</h6>
-                                <span class="fw-normal">Yeni Müşteri</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">0533 789 0123</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Bu hafta kayıt oldu</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-info-subtle text-info">Yeni</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-edit"></i>Düzenle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-phone"></i>Ara
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-trash"></i>Sil
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-6.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Zeynep Şahin</h6>
-                                <span class="fw-normal">Standart Müşteri</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">0542 345 6789</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Günlük alışveriş yapar</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-success-subtle text-success">Aktif</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-edit"></i>Düzenle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-phone"></i>Ara
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-trash"></i>Sil
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
+                      <tbody id="customers-table-body">
+                        <!-- Müşteri verileri JavaScript ile dinamik olarak yüklenecek -->
                       </tbody>
                     </table>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Customer Modal -->
+          <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="addCustomerModalLabel">
+                    <i class="fas fa-user-plus me-2"></i>Yeni Müşteri Ekle
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="add-customer-form">
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <input type="text" class="form-control" id="customer-name-input" name="name" placeholder="Adınızı giriniz" required>
+                          <label for="customer-name-input">
+                            <i class="fas fa-user me-2"></i>Ad *
+                          </label>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <input type="text" class="form-control" id="customer-surname-input" name="surname" placeholder="Soyadınızı giriniz" required>
+                          <label for="customer-surname-input">
+                            <i class="fas fa-user me-2"></i>Soyad *
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <input type="tel" class="form-control" id="customer-phone-input" name="phoneNumber" placeholder="0555 123 45 67" required>
+                          <label for="customer-phone-input">
+                            <i class="fas fa-phone me-2"></i>Telefon Numarası *
+                          </label>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <textarea class="form-control" id="customer-note-input" name="note" placeholder="Müşteri hakkında notlar..." style="height: 100px"></textarea>
+                          <label for="customer-note-input">
+                            <i class="fas fa-sticky-note me-2"></i>Not (Opsiyonel)
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                      <i class="fas fa-times me-2"></i>İptal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="fas fa-save me-2"></i>Müşteri Kaydet
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -538,6 +438,25 @@
   <script src="../assets/js/theme/theme.js"></script>
   <script src="../assets/js/theme/app.min.js"></script>
   <script src="../assets/js/theme/sidebarmenu.js"></script>
+
+  <!-- jQuery (DataTables için gerekli) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  
+  <!-- DataTables JS -->
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+  <!-- API Service -->
+  <script src="../assets/js/apiService.js"></script>
+  <!-- Customers Module -->
+  <script src="../assets/js/customers.js"></script>
 
   <!-- solar icons -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>

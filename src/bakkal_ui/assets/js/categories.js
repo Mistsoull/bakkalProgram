@@ -61,7 +61,7 @@ function initializeDataTable() {
         
         categoriesDataTable = $(categoriesTable).DataTable({
             responsive: true,
-            pageLength: 25,
+            pageLength: 10,
             lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
             processing: true,
             search: {
@@ -431,31 +431,129 @@ function editCategory(categoryId) {
  * @param {string} categoryName - Onay için kategori adı
  */
 async function deleteCategory(categoryId, categoryName) {
-    const confirmed = confirm(`"${categoryName}" kategorisini silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.`);
+    // SweetAlert2 kullanılabilirse modern onay penceresi, yoksa standart confirm
+    let confirmed = false;
+    
+    if (typeof Swal !== 'undefined') {
+        const result = await Swal.fire({
+            title: 'Kategori Silme Onayı',
+            html: `<strong>"${categoryName}"</strong> kategorisini silmek istediğinizden emin misiniz?<br><br><small class="text-muted">Bu işlem geri alınamaz.</small>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-trash me-2"></i>Evet, Sil',
+            cancelButtonText: '<i class="fas fa-times me-2"></i>İptal',
+            reverseButtons: true,
+            focusCancel: true
+        });
+        confirmed = result.isConfirmed;
+    } else {
+        // Fallback: Standart browser confirm
+        confirmed = confirm(`"${categoryName}" kategorisini silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.`);
+    }
     
     if (!confirmed) return;
 
     try {
-        await window.apiService.fetchDelete(`Categories/${categoryId}`);
-        
-        // DataTable'dan satırı kaldır
-        if (categoriesDataTable) {
-            // Silinen kategoriyi DataTable'dan bul ve kaldır
-            categoriesDataTable.rows().every(function(rowIdx, tableLoop, rowLoop) {
-                const rowData = this.data();
-                // İşlemler sütunundaki kategori ID'sini kontrol et (onclick="deleteCategory('id')" içinden)
-                if (rowData[3] && rowData[3].includes(`'${categoryId}'`)) {
-                    this.remove();
-                    return false; // Döngüyü sonlandır
+        // Loading bildirimi göster
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Siliniyor...',
+                text: 'Kategori siliniyor, lütfen bekleyin.',
+                icon: 'info',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
             });
-            categoriesDataTable.draw();
         }
+        
+        // API'ye DELETE isteği gönder - Doğru endpoint formatı
+        console.log(`Kategori siliniyor: ${categoryId} - ${categoryName}`);
+        await window.apiService.fetchDelete(`Categories/${categoryId}`);
+        console.log(`API çağrısı başarılı: ${categoryId} - ${categoryName}`);
+        
+    } catch (apiError) {
+        console.error('API silme hatası:', apiError);
+        
+        // API hatası için mesaj belirle
+        let errorMessage = 'Kategori silinirken bir hata oluştu.';
+        
+        if (apiError.message && apiError.message.includes('404')) {
+            errorMessage = 'Kategori bulunamadı. Sayfa yenilenecek.';
+        } else if (apiError.message && apiError.message.includes('403')) {
+            errorMessage = 'Bu işlem için yetkiniz yok.';
+        } else if (apiError.message && apiError.message.includes('400')) {
+            errorMessage = 'Bu kategoriye ait ürünler var. Önce ürünleri silmeniz gerekiyor.';
+        } else if (apiError.message && apiError.message.includes('500')) {
+            errorMessage = 'Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.';
+        }
+        
+        // API hatası bildirimi
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Hata!',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'Tamam'
+            });
+        } else {
+            showNotification(errorMessage, 'error');
+        }
+        return; // Fonksiyondan çık
+    }
 
-        showNotification('Kategori başarıyla silindi.', 'success');
-    } catch (error) {
-        console.error('Kategori silinemedi:', error);
-        showNotification('Kategori silinirken bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+    // API başarılı oldu, UI işlemlerini yap
+    try {
+        console.log(`Kategori başarıyla silindi: ${categoryId} - ${categoryName}`);
+        
+        // Başarı bildirimi
+        if (typeof Swal !== 'undefined') {
+            await Swal.fire({
+                title: 'Başarılı!',
+                text: `"${categoryName}" kategorisi başarıyla silindi.`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } else {
+            showNotification('Kategori başarıyla silindi!', 'success');
+        }
+        
+        // DataTable'ı yenile - En güvenli yöntem
+        if (categoriesDataTable) {
+            console.log('Kategori silindi, tablo yenileniyor...');
+            try {
+                // Tüm tabloyu yenile
+                await loadCategories();
+                console.log('Tablo başarıyla yenilendi');
+            } catch (reloadError) {
+                console.warn('Tablo yenilenemedi, manuel yenileme deneniyor:', reloadError);
+                // Manuel yenileme
+                try {
+                    categoriesDataTable.ajax.reload(null, false);
+                    console.log('Manuel tablo yenilemesi başarılı');
+                } catch (manualError) {
+                    console.error('Manuel yenileme de başarısız:', manualError);
+                    // Son çare: sayfayı yenile
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                }
+            }
+        } else {
+            console.warn('categoriesDataTable bulunamadı, sayfayı yeniliyoruz');
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+        
+    } catch (uiError) {
+        console.error('UI güncelleme hatası (önemli değil):', uiError);
+        // UI hatalarını kullanıcıya gösterme, sadece log'la
     }
 }
 

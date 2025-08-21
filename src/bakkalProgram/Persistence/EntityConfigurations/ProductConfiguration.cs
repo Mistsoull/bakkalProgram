@@ -12,6 +12,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.Id).HasColumnName("Id").IsRequired();
         builder.Property(p => p.Name).HasColumnName("Name").IsRequired();
+        builder.Property(p => p.Price).HasColumnName("Price").IsRequired().HasColumnType("decimal(18,2)");
         builder.Property(p => p.CategoryId).HasColumnName("CategoryId").IsRequired();
         builder.Property(p => p.CreatedDate).HasColumnName("CreatedDate").IsRequired();
         builder.Property(p => p.UpdatedDate).HasColumnName("UpdatedDate");
