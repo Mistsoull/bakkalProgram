@@ -16,6 +16,7 @@ const orderCustomerSurnameInput = document.getElementById('order-customer-surnam
 const orderDeliveryDateInput = document.getElementById('order-delivery-date-input');
 const orderProductSelect = document.getElementById('order-product-select');
 const orderCustomerSelect = document.getElementById('order-customer-select');
+const orderPaymentStatusSelect = document.getElementById('order-payment-status-select');
 
 // Modal instance
 let addOrderModal = null;
@@ -58,7 +59,7 @@ function initializeDataTable() {
                     extend: 'copy',
                     text: '<i class="fas fa-copy me-1"></i>Kopyala',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4], // Müşteri, ürün, miktar, tarih, durum
+                        columns: [0, 1, 2, 3, 4, 5], // Müşteri, ürün, miktar, tarih, durum
                         format: {
                             body: function (data, row, column, node) {
                                 // HTML etiketlerini temizle
@@ -72,7 +73,7 @@ function initializeDataTable() {
                     text: '<i class="fas fa-file-csv me-1"></i>CSV',
                     filename: 'siparisler_' + new Date().toISOString().slice(0,10),
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4],
+                        columns: [0, 1, 2, 3, 4, 5],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -86,7 +87,7 @@ function initializeDataTable() {
                     filename: 'siparisler_' + new Date().toISOString().slice(0,10),
                     title: 'Sipariş Listesi',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4],
+                        columns: [0, 1, 2, 3, 4, 5],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -102,7 +103,7 @@ function initializeDataTable() {
                     orientation: 'landscape',
                     pageSize: 'A4',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4],
+                        columns: [0, 1, 2, 3, 4, 5],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -115,7 +116,7 @@ function initializeDataTable() {
                     text: '<i class="fas fa-print me-1"></i>Yazdır',
                     title: 'Sipariş Listesi',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4],
+                        columns: [0, 1, 2, 3, 4, 5],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -152,7 +153,7 @@ function initializeDataTable() {
             order: [[3, 'desc']], // Teslimat tarihine göre azalan sırala (en yeni üstte)
             columnDefs: [
                 {
-                    targets: [5], // İşlemler sütunu
+                    targets: [6], // İşlemler sütunu
                     orderable: false,
                     searchable: false,
                     width: "140px",
@@ -251,6 +252,17 @@ function getStatusBadge(isDelivered) {
         return '<span class="badge bg-success-subtle text-success">Teslim Edildi</span>';
     } else {
         return '<span class="badge bg-warning-subtle text-warning">Bekliyor</span>';
+    }
+}
+
+/**
+ * Ödeme durumunu badge ile gösterir
+ */
+function getPaymentStatusBadge(isPaid) {
+    if (isPaid) {
+        return '<span class="badge bg-success-subtle text-success">Ödendi</span>';
+    } else {
+        return '<span class="badge bg-danger-subtle text-danger">Ödenmedi</span>';
     }
 }
 
@@ -459,6 +471,9 @@ function createOrderRowData(order) {
         // Durum
         `${getStatusBadge(order.isDelivered)}`,
         
+        // Ödeme Durumu
+        `${getPaymentStatusBadge(order.isPaid)}`,
+        
         // İşlemler
         `<div class="d-flex justify-content-center gap-1">
             <button class="btn btn-outline-success btn-sm" onclick="toggleOrderStatus('${order.id}', ${!order.isDelivered})" title="${order.isDelivered ? 'Bekliyor Yap' : 'Teslim Et'}">
@@ -484,6 +499,7 @@ function handleAddOrderForm(event) {
         customerName: orderCustomerNameInput.value.trim(),
         customerSurname: orderCustomerSurnameInput.value.trim() || null,
         deliveryDate: orderDeliveryDateInput.value,
+        isPaid: orderPaymentStatusSelect.value === 'true',
         productId: orderProductSelect.value || null,
         customerId: orderCustomerSelect.value || null
     };
@@ -511,6 +527,12 @@ function handleAddOrderForm(event) {
         orderDeliveryDateInput.focus();
         orderDeliveryDateInput.classList.add('is-invalid');
         showToast('error', 'Hata!', 'Teslimat tarihi zorunludur.');
+        return;
+    }
+    if (!orderPaymentStatusSelect.value) {
+        orderPaymentStatusSelect.focus();
+        orderPaymentStatusSelect.classList.add('is-invalid');
+        showToast('error', 'Hata!', 'Ödeme durumu seçimi zorunludur.');
         return;
     }
     
@@ -541,7 +563,7 @@ function handleAddOrderForm(event) {
             showToast('success', 'Başarılı!', 'Sipariş başarıyla eklendi.');
             
             // Input validasyon sınıflarını temizle
-            [orderProductNameInput, orderQuantityInput, orderCustomerNameInput, orderCustomerSurnameInput, orderDeliveryDateInput].forEach(input => {
+            [orderProductNameInput, orderQuantityInput, orderCustomerNameInput, orderCustomerSurnameInput, orderDeliveryDateInput, orderPaymentStatusSelect].forEach(input => {
                 input.classList.remove('is-invalid', 'is-valid');
             });
             
@@ -779,7 +801,7 @@ function setupDropdownHandlers() {
  * Input validasyon olaylarını ayarla
  */
 function setupInputValidation() {
-    const inputs = [orderProductNameInput, orderQuantityInput, orderCustomerNameInput, orderCustomerSurnameInput, orderDeliveryDateInput];
+    const inputs = [orderProductNameInput, orderQuantityInput, orderCustomerNameInput, orderCustomerSurnameInput, orderDeliveryDateInput, orderPaymentStatusSelect];
     
     inputs.forEach(input => {
         if (!input) return;
@@ -914,6 +936,7 @@ window.ordersModule = {
     deleteOrder,
     formatDate,
     getStatusBadge,
+    getPaymentStatusBadge,
     initializeDataTable
 };
 

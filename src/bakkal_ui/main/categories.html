@@ -416,9 +416,9 @@
                       <h5 class="card-title fw-semibold">Kategori Listesi</h5>
                     </div>
                     <div>
-                      <a href="add-category.html" class="btn btn-primary">
+                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
                         <i class="fas fa-plus me-2"></i>Yeni Kategori Ekle
-                      </a>
+                      </button>
                     </div>
                   </div>
                   <div class="table-responsive">
@@ -445,6 +445,39 @@
                     </table>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Category Modal -->
+          <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="addCategoryModalLabel">
+                    <i class="fas fa-plus me-2"></i>Yeni Kategori Ekle
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="add-category-form">
+                  <div class="modal-body">
+                    <div class="row">
+                      <!-- Kategori Adı -->
+                      <div class="col-12 mb-3">
+                        <label for="category-name-input" class="form-label">Kategori Adı <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="category-name-input" placeholder="Kategori adını giriniz" required>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                      <i class="fas fa-times me-2"></i>İptal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="fas fa-save me-2"></i>Kategoriyi Kaydet
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

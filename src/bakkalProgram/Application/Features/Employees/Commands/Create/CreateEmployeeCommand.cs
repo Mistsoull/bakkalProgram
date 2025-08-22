@@ -11,6 +11,7 @@ public class CreateEmployeeCommand : IRequest<CreatedEmployeeResponse>
     public required string Name { get; set; }
     public required string Surname { get; set; }
     public required string PhoneNumber { get; set; }
+    public string? Note { get; set; }
 
     public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeCommand, CreatedEmployeeResponse>
     {

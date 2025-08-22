@@ -13,6 +13,7 @@ public class CreateOrderCommand : IRequest<CreatedOrderResponse>
     public required string CustomerName { get; set; }
     public string? CustomerSurname { get; set; }
     public required DateTime DeliveryDate { get; set; }
+    public required bool isPaid { get; set; }
     public Guid? ProductId { get; set; }
     public Guid? CustomerId { get; set; }
 

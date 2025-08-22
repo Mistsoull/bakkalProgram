@@ -372,15 +372,26 @@ async function handleFormSubmit(event) {
 
     try {
         // API'ye POST isteği gönder
-        const newCategory = await window.apiService.fetchPost('Categories', {
+        const categoryData = {
             name: categoryName
-        });
+        };
+        
+        const newCategory = await window.apiService.fetchPost('Categories', categoryData);
 
         // Başarı işlemi
         if (newCategory) {
             // Formu temizle
             categoryNameInput.value = '';
             categoryNameInput.classList.remove('is-valid', 'is-invalid');
+
+            // Modal'ı kapat (eğer modal içindeyse)
+            const modal = document.getElementById('addCategoryModal');
+            if (modal) {
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                if (bootstrapModal) {
+                    bootstrapModal.hide();
+                }
+            }
 
             // Başarı mesajı göster
             showNotification('Kategori başarıyla eklendi!', 'success');

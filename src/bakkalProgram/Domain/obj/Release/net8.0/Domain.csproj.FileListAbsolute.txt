@@ -1,0 +1,13 @@
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/bin/Release/net8.0/Domain.deps.json
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/bin/Release/net8.0/Domain.dll
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/bin/Release/net8.0/Domain.pdb
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/Domain.csproj.AssemblyReference.cache
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/Domain.AssemblyInfoInputs.cache
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/Domain.AssemblyInfo.cs
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/Domain.csproj.CoreCompileInputs.cache
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/Domain.sourcelink.json
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/Domain.dll
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/refint/Domain.dll
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/Domain.pdb
+/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/ref/Domain.dll

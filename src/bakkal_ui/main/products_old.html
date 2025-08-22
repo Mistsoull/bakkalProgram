@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="vertical">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Favicon icon-->
+  <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png">
+
+  <!-- Core Css -->
+  <link rel="stylesheet" href="../assets/css/styles.css">
+
+  <title>Bakkal Dükkanı - Ürünler</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="../assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+  <!-- DataTables Buttons CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+  
+  <style>
+    /* DataTable Buttons Custom Styling */
+    .dt-buttons {
+      margin-bottom: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .dt-buttons .btn {
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .dt-buttons .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    @media (max-width: 768px) {
+      .dt-buttons {
+        flex-direction: column;
+      }
+      
+      .dt-buttons .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+    }
+    
+    /* DataTable Action Buttons Styling */
+    .table tbody td .btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      border: none !important;
+      background: transparent !important;
+    }
+    
+    .table tbody td .btn i {
+      font-size: 0.875rem;
+    }
+    
+    /* Action button colors without borders */
+    .table tbody td .btn-outline-warning {
+      color: #ffc107;
+    }
+    
+    .table tbody td .btn-outline-warning:hover {
+      color: #000000;
+      background-color: #ffc107 !important;
+    }
+    
+    .table tbody td .btn-outline-danger {
+      color: #dc3545;
+    }
+    
+    .table tbody td .btn-outline-danger:hover {
+      color: #ffffff;
+      background-color: #dc3545 !important;
+    }
+    
+    /* Make action column wider and centered */
+    #products-datatable tbody td:last-child {
+      min-width: 140px;
+      white-space: nowrap;
+      text-align: center;
+      vertical-align: middle;
+    }
+    
+    /* Center the action buttons container */
+    #products-datatable tbody td:last-child .d-flex {
+      justify-content: center;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+    
+    /* Action buttons hover effects */
+    .table tbody td .btn:hover {
+      transform: scale(1.05);
+      transition: all 0.2s ease-in-out;
+    }
+    
+    /* Remove horizontal scrollbar from table */
+    .table-responsive {
+      overflow-x: hidden;
+      margin-bottom: 1rem;
+    }
+    
+    /* DataTable pagination buttons styling */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      border: none !important;
+      background: none !important;
+      padding: 0.125rem 0.25rem !important;
+      margin: 0 0.0625rem !important;
+      font-size: 0.75rem !important;
+      border-radius: 0.5rem !important;
+      min-width: 1.5rem !important;
+      height: 1.5rem !important;
+      line-height: 1 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+      border: none !important;
+      background: rgba(0, 123, 255, 0.1) !important;
+      color: #007bff !important;
+      border-radius: 0.5rem !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+      border: none !important;
+      background: rgba(0, 123, 255, 0.15) !important;
+      color: #007bff !important;
+      font-weight: bold !important;
+      border-radius: 0.5rem !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+      color: #6c757d !important;
+      opacity: 0.5 !important;
+    }
+    
+    /* Make sure table fits within container */
+    #products-datatable {
+      width: 100% !important;
+      table-layout: fixed;
+    }
+    
+    /* Adjust column widths to prevent overflow */
+    #products-datatable th:nth-child(1),
+    #products-datatable td:nth-child(1) {
+      width: 30%;
+    }
+    
+    #products-datatable th:nth-child(2),
+    #products-datatable td:nth-child(2) {
+      width: 25%;
+    }
+    
+    #products-datatable th:nth-child(3),
+    #products-datatable td:nth-child(3) {
+      width: 15%;
+    }
+    
+    #products-datatable th:nth-child(4),
+    #products-datatable td:nth-child(4) {
+      width: 10%;
+    }
+    
+    #products-datatable th:nth-child(5),
+    #products-datatable td:nth-child(5) {
+      width: 20%;
+    }
+    
+    /* Mobile responsive action buttons */
+    @media (max-width: 576px) {
+      #products-datatable tbody td:last-child {
+        min-width: 120px;
+      }
+      
+      .table tbody td .btn {
+        padding: 0.125rem 0.25rem;
+        font-size: 0.6rem;
+        margin: 0 1px;
+      }
+      
+      .table tbody td .btn i {
+        font-size: 0.75rem;
+      }
+      
+      /* Stack buttons vertically on very small screens */
+      @media (max-width: 400px) {
+        #products-datatable tbody td:last-child .d-flex {
+          flex-direction: column;
+          gap: 2px;
+        }
+        
+        #products-datatable tbody td:last-child {
+          min-width: 80px;
+        }
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Preloader -->
+  <div class="preloader">
+    <img src="../assets/images/logos/favicon.png" alt="loader" class="lds-ripple img-fluid">
+  </div>
+  <div id="main-wrapper">
+    <!-- Sidebar Start -->
+    <aside class="left-sidebar with-vertical">
+      <div>
+        <!-- Start Vertical Layout Sidebar -->
+        <div class="brand-logo d-flex align-items-center justify-content-between">
+          <a href="dashboard.html" class="text-nowrap logo-img">
+            <img src="../assets/images/logos/dark-logo.svg" class="dark-logo" alt="Logo-Dark">
+            <img src="../assets/images/logos/light-logo.svg" class="light-logo" alt="Logo-light">
+          </a>
+          <a href="javascript:void(0)" class="sidebartoggler ms-auto text-decoration-none fs-5 d-block d-xl-none">
+            <i class="ti ti-x"></i>
+          </a>
+        </div>
+
+        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+          <ul id="sidebarnav">
+            <!-- Dashboard -->
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Ana Sayfa</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="dashboard.html" aria-expanded="false">
+                <span>
+                  <i class="fas fa-tachometer-alt"></i>
+                </span>
+                <span class="hide-menu">Gösterge Paneli</span>
+              </a>
+            </li>
+
+            <!-- Satış İşlemleri -->
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Satış İşlemleri</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="on-credit.html" aria-expanded="false">
+                <span>
+                  <i class="fas fa-book"></i>
+                </span>
+                <span class="hide-menu">Veresiye Defteri</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="orders.html" aria-expanded="false">
+                <span>
+                  <i class="fas fa-dolly"></i>
+                </span>
+                <span class="hide-menu">Siparişler</span>
+              </a>
+            </li>
+
+            <!-- Yönetim -->
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Yönetim</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link active" href="products.html" aria-expanded="false">
+                <span>
+                  <i class="fas fa-box-open"></i>
+                </span>
+                <span class="hide-menu">Ürünler</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="categories.html" aria-expanded="false">
+                <span>
+                  <i class="fas fa-tags"></i>
+                </span>
+                <span class="hide-menu">Kategoriler</span>
+              </a>
+            </li>
+
+            <!-- Kişiler -->
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Kişiler</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="customers.html" aria-expanded="false">
+                <span>
+                  <i class="fas fa-user-friends"></i>
+                </span>
+                <span class="hide-menu">Müşteriler</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="employees.html" aria-expanded="false">
+                <span>
+                  <i class="fas fa-user-tie"></i>
+                </span>
+                <span class="hide-menu">Otel Çalışanları</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="fixed-profile p-3 mx-4 mb-2 bg-secondary-subtle rounded mt-3">
+          <div class="hstack gap-3">
+            <div class="john-img">
+              <img src="../assets/images/profile/user-1.jpg" class="rounded-circle" width="40" height="40"
+                alt="modernize-img">
+            </div>
+            <div class="john-title">
+              <h6 class="mb-0 fs-4 fw-semibold">Bakkal</h6>
+              <span class="fs-2">Yönetici</span>
+            </div>
+            <button class="border-0 bg-transparent text-primary ms-auto" tabindex="0" type="button" aria-label="logout"
+              data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Çıkış Yap">
+              <i class="ti ti-power fs-6"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <!--  Sidebar End -->
+
+    <div class="page-wrapper">
+      <!--  Header Start -->
+      <header class="topbar">
+        <div class="with-vertical">
+          <nav class="navbar navbar-expand-lg p-0">
+            <ul class="navbar-nav">
+              <li class="nav-item nav-icon-hover-bg rounded-circle ms-n2">
+                <a class="nav-link sidebartoggler" id="headerCollapse" href="javascript:void(0)">
+                  <i class="ti ti-menu-2"></i>
+                </a>
+              </li>
+            </ul>
+
+            <div class="d-block d-lg-none py-4">
+              <a href="dashboard.html" class="text-nowrap logo-img">
+                <img src="../assets/images/logos/dark-logo.svg" class="dark-logo" alt="Logo-Dark">
+                <img src="../assets/images/logos/light-logo.svg" class="light-logo" alt="Logo-light">
+              </a>
+            </div>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+              <div class="d-flex align-items-center justify-content-between">
+                <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-center">
+                  <!-- Dark/Light Mode Toggle -->
+                  <li class="nav-item nav-icon-hover-bg rounded-circle">
+                    <a class="nav-link moon dark-layout" href="javascript:void(0)">
+                      <i class="ti ti-moon moon"></i>
+                    </a>
+                    <a class="nav-link sun light-layout" href="javascript:void(0)">
+                      <i class="ti ti-sun sun"></i>
+                    </a>
+                  </li>
+
+                  <!-- Profile Dropdown -->
+                  <li class="nav-item dropdown">
+                    <a class="nav-link pe-0" href="javascript:void(0)" id="drop1" aria-expanded="false">
+                      <div class="d-flex align-items-center">
+                        <div class="user-profile-img">
+                          <img src="../assets/images/profile/user-1.jpg" class="rounded-circle" width="35" height="35"
+                            alt="modernize-img">
+                        </div>
+                      </div>
+                    </a>
+                    <div class="dropdown-menu content-dd dropdown-menu-end dropdown-menu-animate-up"
+                      aria-labelledby="drop1">
+                      <div class="profile-dropdown position-relative" data-simplebar="">
+                        <div class="py-3 px-7 pb-0">
+                          <h5 class="mb-0 fs-5 fw-semibold">Kullanıcı Profili</h5>
+                        </div>
+                        <div class="d-flex align-items-center py-9 mx-7 border-bottom">
+                          <img src="../assets/images/profile/user-1.jpg" class="rounded-circle" width="80" height="80"
+                            alt="modernize-img">
+                          <div class="ms-3">
+                            <h5 class="mb-1 fs-3">Bakkal Yöneticisi</h5>
+                            <span class="mb-1 d-block">Yönetici</span>
+                            <p class="mb-0 d-flex align-items-center gap-2">
+                              <i class="ti ti-mail fs-4"></i> bakkal@hotel.com
+                            </p>
+                          </div>
+                        </div>
+                        <div class="d-grid py-4 px-7 pt-8">
+                          <a href="authentication-login.html" class="btn btn-outline-primary">Çıkış Yap</a>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+        </div>
+      </header>
+      <!--  Header End -->
+
+      <div class="body-wrapper">
+        <div class="container-fluid">
+          <!-- Breadcrumb -->
+          <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+            <div class="card-body px-4 py-3">
+              <div class="row align-items-center">
+                <div class="col-9">
+                  <h4 class="fw-semibold mb-8">Ürünler</h4>
+                  <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                      <li class="breadcrumb-item">
+                        <a class="text-muted text-decoration-none" href="dashboard.html">Ana Sayfa</a>
+                      </li>
+                      <li class="breadcrumb-item" aria-current="page">Ürünler</li>
+                    </ol>
+                  </nav>
+                </div>
+                <div class="col-3">
+                  <div class="text-center mb-n5">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Products Table -->
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                    <div class="mb-3 mb-sm-0">
+                      <h5 class="card-title fw-semibold">Ürün Listesi</h5>
+                    </div>
+                    <div>
+                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        <i class="fas fa-plus me-2"></i>Yeni Ürün Ekle
+                      </button>
+                    </div>
+                  </div>
+                  <div class="table-responsive">
+                    <table id="products-datatable" class="table text-nowrap mb-0 align-middle">
+                      <thead class="text-dark fs-4">
+                        <tr>
+                          <th>
+                            <h6 class="fs-4 fw-semibold mb-0">Ürün Adı</h6>
+                          </th>
+                          <th>
+                            <h6 class="fs-4 fw-semibold mb-0">Kategori</h6>
+                          </th>
+                          <th>
+                            <h6 class="fs-4 fw-semibold mb-0">Fiyat</h6>
+                          </th>
+                          <th>
+                            <h6 class="fs-4 fw-semibold mb-0">Durum</h6>
+                          </th>
+                          <th class="text-center">
+                            <h6 class="fs-4 fw-semibold mb-0">İşlemler</h6>
+                          </th>
+                        </tr>
+                      </thead>
+                                            <tbody>
+                        <!-- Products will be loaded dynamically via JavaScript -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Product Modal -->
+          <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="addProductModalLabel">
+                    <i class="fas fa-plus me-2"></i>Yeni Ürün Ekle
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="add-product-form">
+                  <div class="modal-body">
+                    <div class="row">
+                      <!-- Ürün Adı -->
+                      <div class="col-md-6 mb-3">
+                        <label for="product-name-input" class="form-label">Ürün Adı <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="product-name-input" placeholder="Ürün adını giriniz" required>
+                      </div>
+                      
+                      <!-- Kategori Seçimi -->
+                      <div class="col-md-6 mb-3">
+                        <label for="product-category-select" class="form-label">Kategori <span class="text-danger">*</span></label>
+                        <select class="form-select" id="product-category-select" required>
+                          <option value="">Kategori Seç</option>
+                        </select>
+                      </div>
+                      
+                      <!-- Fiyat -->
+                      <div class="col-md-6 mb-3">
+                        <label for="product-price-input" class="form-label">Fiyat (₺) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="product-price-input" placeholder="Fiyat giriniz" min="0" step="0.01" required>
+                      </div>
+                      
+                      <!-- Stok Durumu -->
+                      <div class="col-md-6 mb-3">
+                        <label for="product-stock-status-select" class="form-label">Stok Durumu <span class="text-danger">*</span></label>
+                        <select class="form-select" id="product-stock-status-select" required>
+                          <option value="">Stok Durumu Seç</option>
+                          <option value="Stokta">Stokta</option>
+                          <option value="Az Stok">Az Stok</option>
+                          <option value="Stok Yok">Stok Yok</option>
+                        </select>
+                      </div>
+                      
+                      <!-- Açıklama -->
+                      <div class="col-12 mb-3">
+                        <label for="product-description-input" class="form-label">Açıklama (Opsiyonel)</label>
+                        <textarea class="form-control" id="product-description-input" rows="3" placeholder="Ürün açıklaması giriniz"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                      <i class="fas fa-times me-2"></i>İptal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="fas fa-save me-2"></i>Ürünü Kaydet
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <div class="me-3">
+                                <i class="fas fa-bread-slice fs-6 text-warning"></i>
+                              </div>
+                              <div>
+                                <h6 class="fs-4 fw-semibold mb-0">Ekmek</h6>
+                                <span class="fw-normal">Günlük taze ekmek</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <p class="mb-0 fw-normal">Unlu Mamüller</p>
+                          </td>
+                          <td>
+                            <span class="badge bg-success-subtle text-success">Stokta</span>
+                          </td>
+                          <td>
+                            <p class="mb-0 fw-normal">15/01/2024</p>
+                          </td>
+                          <td>
+                            <div class="dropdown dropstart">
+                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="ti ti-dots-vertical fs-6"></i>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
+                                  </a>
+                                </li>
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-edit"></i>Düzenle
+                                  </a>
+                                </li>
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-trash"></i>Sil
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <div class="me-3">
+                                <i class="fas fa-glass-whiskey fs-6 text-primary"></i>
+                              </div>
+                              <div>
+                                <h6 class="fs-4 fw-semibold mb-0">Su (1.5L)</h6>
+                                <span class="fw-normal">İçme suyu</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <p class="mb-0 fw-normal">İçecekler</p>
+                          </td>
+                          <td>
+                            <span class="badge bg-success-subtle text-success">Stokta</span>
+                          </td>
+                          <td>
+                            <p class="mb-0 fw-normal">14/01/2024</p>
+                          </td>
+                          <td>
+                            <div class="dropdown dropstart">
+                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="ti ti-dots-vertical fs-6"></i>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
+                                  </a>
+                                </li>
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-edit"></i>Düzenle
+                                  </a>
+                                </li>
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-trash"></i>Sil
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <div class="me-3">
+                                <i class="fas fa-candy-cane fs-6 text-danger"></i>
+                              </div>
+                              <div>
+                                <h6 class="fs-4 fw-semibold mb-0">Çikolata</h6>
+                                <span class="fw-normal">Sütlü çikolata</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <p class="mb-0 fw-normal">Şekerleme</p>
+                          </td>
+                          <td>
+                            <span class="badge bg-warning-subtle text-warning">Az Stok</span>
+                          </td>
+                          <td>
+                            <p class="mb-0 fw-normal">13/01/2024</p>
+                          </td>
+                          <td>
+                            <div class="dropdown dropstart">
+                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="ti ti-dots-vertical fs-6"></i>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
+                                  </a>
+                                </li>
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-edit"></i>Düzenle
+                                  </a>
+                                </li>
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-trash"></i>Sil
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <div class="me-3">
+                                <i class="fas fa-newspaper fs-6 text-secondary"></i>
+                              </div>
+                              <div>
+                                <h6 class="fs-4 fw-semibold mb-0">Gazete</h6>
+                                <span class="fw-normal">Günlük gazete</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <p class="mb-0 fw-normal">Kırtasiye</p>
+                          </td>
+                          <td>
+                            <span class="badge bg-success-subtle text-success">Stokta</span>
+                          </td>
+                          <td>
+                            <p class="mb-0 fw-normal">12/01/2024</p>
+                          </td>
+                          <td>
+                            <div class="dropdown dropstart">
+                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="ti ti-dots-vertical fs-6"></i>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
+                                  </a>
+                                </li>
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-edit"></i>Düzenle
+                                  </a>
+                                </li>
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-trash"></i>Sil
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <div class="me-3">
+                                <i class="fas fa-ice-cream fs-6 text-info"></i>
+                              </div>
+                              <div>
+                                <h6 class="fs-4 fw-semibold mb-0">Dondurma</h6>
+                                <span class="fw-normal">Vanilyalı dondurma</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <p class="mb-0 fw-normal">Donmuş Gıda</p>
+                          </td>
+                          <td>
+                            <span class="badge bg-danger-subtle text-danger">Stok Yok</span>
+                          </td>
+                          <td>
+                            <p class="mb-0 fw-normal">10/01/2024</p>
+                          </td>
+                          <td>
+                            <div class="dropdown dropstart">
+                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="ti ti-dots-vertical fs-6"></i>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
+                                  </a>
+                                </li>
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-edit"></i>Düzenle
+                                  </a>
+                                </li>
+                                <li>
+                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
+                                    <i class="fs-4 ti ti-trash"></i>Sil
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Js Files -->
+  <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/libs/simplebar/dist/simplebar.min.js"></script>
+  <script src="../assets/js/theme/app.init.js"></script>
+  <script src="../assets/js/theme/theme.js"></script>
+  <script src="../assets/js/theme/app.min.js"></script>
+  <script src="../assets/js/theme/sidebarmenu.js"></script>
+
+  <!-- solar icons -->
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+</body>
+
+</html>

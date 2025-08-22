@@ -374,6 +374,42 @@ function setupEventListeners() {
     if (addProductForm) {
         addProductForm.addEventListener('submit', handleFormSubmit);
     }
+    
+    // Kategori seçim alanını doldur (modal açıldığında)
+    const addProductModal = document.getElementById('addProductModal');
+    if (addProductModal) {
+        addProductModal.addEventListener('show.bs.modal', loadCategoriesForSelect);
+    }
+}
+
+/**
+ * Kategori seçim alanını doldurmak için kategorileri yükle
+ */
+async function loadCategoriesForSelect() {
+    const categorySelect = document.getElementById('product-category-select');
+    if (!categorySelect) return;
+
+    try {
+        // API'den kategorileri çek
+        const response = await window.apiService.fetchGetAll('Categories');
+        const categories = response.items || response;
+
+        // Seçim alanını temizle
+        categorySelect.innerHTML = '<option value="">Kategori Seç</option>';
+
+        // Kategorileri seçim alanına ekle
+        if (categories && categories.length > 0) {
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = category.name;
+                categorySelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Kategoriler yüklenemedi:', error);
+        showNotification('Kategoriler yüklenirken bir hata oluştu.', 'warning');
+    }
 }
 
 /**
@@ -579,11 +615,29 @@ async function handleFormSubmit(event) {
     if (!productNameInput || !addProductButton) return;
 
     const productName = productNameInput.value.trim();
+    const productCategorySelect = document.getElementById('product-category-select');
+    const productPriceInput = document.getElementById('product-price-input');
+
+    // Form elemanlarının varlığını kontrol et
+    const categoryId = productCategorySelect ? productCategorySelect.value.trim() : null;
+    const price = productPriceInput ? parseFloat(productPriceInput.value) || 0 : 0;
 
     // Girdiyi doğrula
     if (!productName) {
         showNotification('Lütfen ürün adını giriniz.', 'warning');
         productNameInput.focus();
+        return;
+    }
+
+    if (productCategorySelect && !categoryId) {
+        showNotification('Lütfen bir kategori seçiniz.', 'warning');
+        productCategorySelect.focus();
+        return;
+    }
+
+    if (productPriceInput && (isNaN(price) || price < 0)) {
+        showNotification('Lütfen geçerli bir fiyat giriniz.', 'warning');
+        productPriceInput.focus();
         return;
     }
 
@@ -593,25 +647,49 @@ async function handleFormSubmit(event) {
     addProductButton.disabled = true;
 
     try {
-        // API'ye POST isteği gönder
-        const newProduct = await window.apiService.fetchPost('Products', {
+        // API'ye gönderilecek ürün verisi
+        const productData = {
             name: productName,
-            price: 0, // Varsayılan fiyat
-            categoryId: null // Kategori seçimi form'da olacak
-        });
+            price: price
+        };
+
+        // Kategori ID'si varsa ekle
+        if (categoryId) {
+            productData.categoryId = categoryId;
+        }
+
+        // API'ye POST isteği gönder
+        const newProduct = await window.apiService.fetchPost('Products', productData);
 
         // Başarı işlemi
         if (newProduct) {
-            showNotification('Ürün başarıyla eklendi!', 'success');
-            
             // Formu temizle
             productNameInput.value = '';
+            if (productCategorySelect) productCategorySelect.value = '';
+            if (productPriceInput) productPriceInput.value = '';
+
+            // Modal'ı kapat (eğer modal içindeyse)
+            const modal = document.getElementById('addProductModal');
+            if (modal) {
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                if (bootstrapModal) {
+                    bootstrapModal.hide();
+                }
+            }
+
+            // Başarı mesajı göster
+            showNotification('Ürün başarıyla eklendi!', 'success');
             
-            // DataTable'ı yenile
-            if (productsDataTable) {
-                // Yeni ürünü tabloya ekle
+            // Ürünler listesi sayfasındaysak, DataTable'a yeni satır ekle
+            if (productsDataTable && window.location.pathname.includes('products.html')) {
+                // Yeni ürünü DataTable'a ekle
                 const newRowData = createProductRowData(newProduct);
-                productsDataTable.row.add(newRowData).draw(false);
+                productsDataTable.row.add(newRowData).draw();
+            } else if (window.location.pathname.includes('add-product.html')) {
+                // Ürün ekleme sayfasındaysak, listeye yönlendir
+                setTimeout(() => {
+                    window.location.href = 'products.html';
+                }, 1500);
             }
         }
     } catch (error) {

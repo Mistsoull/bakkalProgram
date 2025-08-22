@@ -10,6 +10,7 @@ const addEmployeeForm = document.getElementById('add-employee-form');
 const employeeNameInput = document.getElementById('employee-name-input');
 const employeeSurnameInput = document.getElementById('employee-surname-input');
 const employeePhoneInput = document.getElementById('employee-phone-input');
+const employeeNoteInput = document.getElementById('employee-note-input');
 
 // DataTable instance
 let employeesDataTable = null;
@@ -88,7 +89,7 @@ function initializeDataTable() {
                 extend: 'copy',
                 text: '<i class="fas fa-copy me-1"></i>Kopyala',
                 exportOptions: {
-                    columns: [0, 1, 2], // Çalışan, telefon, durum
+                    columns: [0, 1, 2, 3], // Çalışan, telefon, not, durum
                     format: {
                         body: function (data, row, column, node) {
                             // HTML etiketlerini temizle
@@ -102,7 +103,7 @@ function initializeDataTable() {
                 text: '<i class="fas fa-file-csv me-1"></i>CSV',
                 filename: 'calisanlar_' + new Date().toISOString().slice(0,10),
                 exportOptions: {
-                    columns: [0, 1, 2],
+                    columns: [0, 1, 2, 3],
                     format: {
                         body: function (data, row, column, node) {
                             return data.replace(/<.*?>/g, '').trim();
@@ -116,7 +117,7 @@ function initializeDataTable() {
                 filename: 'calisanlar_' + new Date().toISOString().slice(0,10),
                 title: 'Çalışan Listesi',
                 exportOptions: {
-                    columns: [0, 1, 2],
+                    columns: [0, 1, 2, 3],
                     format: {
                         body: function (data, row, column, node) {
                             return data.replace(/<.*?>/g, '').trim();
@@ -132,7 +133,7 @@ function initializeDataTable() {
                 orientation: 'landscape',
                 pageSize: 'A4',
                 exportOptions: {
-                    columns: [0, 1, 2],
+                    columns: [0, 1, 2, 3],
                     format: {
                         body: function (data, row, column, node) {
                             return data.replace(/<.*?>/g, '').trim();
@@ -145,7 +146,7 @@ function initializeDataTable() {
                 text: '<i class="fas fa-print me-1"></i>Yazdır',
                 title: 'Çalışan Listesi',
                 exportOptions: {
-                    columns: [0, 1, 2],
+                    columns: [0, 1, 2, 3],
                     format: {
                         body: function (data, row, column, node) {
                             return data.replace(/<.*?>/g, '').trim();
@@ -156,7 +157,7 @@ function initializeDataTable() {
         ],
         columnDefs: [
             {
-                targets: [3], // İşlemler sütunu
+                targets: [4], // İşlemler sütunu
                 orderable: false,
                 searchable: false,
                 className: "text-center"
@@ -183,6 +184,9 @@ function addEmployeeToDataTable(employee) {
         
         // Telefon
         `<p class="mb-0 fw-normal">${escapeHtml(formatPhoneNumber(employee.phoneNumber))}</p>`,
+        
+        // Not
+        `<p class="mb-0 fw-normal">${escapeHtml(employee.note || '-')}</p>`,
         
         // Durum
         '<span class="badge bg-success-subtle text-success">Aktif</span>',
@@ -246,6 +250,9 @@ async function loadEmployees() {
                     
                     // Telefon
                     `<p class="mb-0 fw-normal">${escapeHtml(formatPhoneNumber(employee.phoneNumber))}</p>`,
+                    
+                    // Not
+                    `<p class="mb-0 fw-normal">${escapeHtml(employee.note || '-')}</p>`,
                     
                     // Durum
                     '<span class="badge bg-success-subtle text-success">Aktif</span>',
@@ -325,6 +332,11 @@ function handleAddEmployeeForm(event) {
         phoneNumber: employeePhoneInput.value.trim()
     };
 
+    // Note alanı varsa ekle
+    if (employeeNoteInput && employeeNoteInput.value.trim()) {
+        employeeData.note = employeeNoteInput.value.trim();
+    }
+
     // Basit validasyon
     if (!employeeData.name) {
         employeeNameInput.focus();
@@ -367,6 +379,9 @@ function handleAddEmployeeForm(event) {
             [employeeNameInput, employeeSurnameInput, employeePhoneInput].forEach(input => {
                 input.classList.remove('is-invalid', 'is-valid');
             });
+            if (employeeNoteInput) {
+                employeeNoteInput.classList.remove('is-invalid', 'is-valid');
+            }
         })
         .catch(error => {
             console.error('Çalışan eklenirken hata:', error);
@@ -463,8 +478,8 @@ async function deleteEmployee(employeeId, employeeName) {
             
             table.rows().every(function(rowIdx, tableLoop, rowLoop) {
                 const rowData = this.data();
-                // İşlemler sütunundaki butonlardan ID'yi çek
-                if (rowData[3] && rowData[3].includes(employeeId)) {
+                // İşlemler sütunundaki butonlardan ID'yi çek (artık 4. sütun - index 4)
+                if (rowData[4] && rowData[4].includes(employeeId)) {
                     this.remove();
                     rowRemoved = true;
                     return false; // Loop'u durdur
@@ -602,6 +617,13 @@ function setupInputValidation() {
             }
         });
     });
+
+    // Note alanı için de validasyon ekle (opsiyonel olduğu için sadece temizleme)
+    if (employeeNoteInput) {
+        employeeNoteInput.addEventListener('input', function() {
+            this.classList.remove('is-invalid', 'is-valid');
+        });
+    }
 }
 
 /**

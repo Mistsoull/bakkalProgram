@@ -478,6 +478,9 @@
                           <th>
                             <h6 class="fs-4 fw-semibold mb-0">Durum</h6>
                           </th>
+                          <th>
+                            <h6 class="fs-4 fw-semibold mb-0">Ödeme Durumu</h6>
+                          </th>
                           <th class="text-center">
                             <h6 class="fs-4 fw-semibold mb-0">İşlemler</h6>
                           </th>
@@ -553,6 +556,16 @@
                       <div class="col-md-6 mb-3">
                         <label for="order-delivery-date-input" class="form-label">Teslimat Tarihi <span class="text-danger">*</span></label>
                         <input type="date" class="form-control" id="order-delivery-date-input" required>
+                      </div>
+                      
+                      <!-- Ödeme Durumu -->
+                      <div class="col-md-6 mb-3">
+                        <label for="order-payment-status-select" class="form-label">Ödeme Durumu <span class="text-danger">*</span></label>
+                        <select class="form-select" id="order-payment-status-select" required>
+                          <option value="">Ödeme durumu seçiniz</option>
+                          <option value="true">Ödendi</option>
+                          <option value="false">Ödenmedi</option>
+                        </select>
                       </div>
                     </div>
                   </div>
