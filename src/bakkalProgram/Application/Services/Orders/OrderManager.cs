@@ -74,4 +74,14 @@ public class OrderManager : IOrderService
 
         return deletedOrder;
     }
+
+    public async Task<int> GetTotalOrderCountByDayAsync(DateTime date)
+    {
+        return await _orderRepository.GetTotalOrderCountByDayAsync(date);
+    }
+
+    public async Task<List<Order>> GetTodaysOrdersAsync(DateTime date)
+    {
+        return await _orderRepository.GetTodaysOrdersAsync(date);
+    }
 }

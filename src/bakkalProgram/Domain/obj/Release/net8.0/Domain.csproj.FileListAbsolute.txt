@@ -11,3 +11,16 @@
 /Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/refint/Domain.dll
 /Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/Domain.pdb
 /Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/Release/net8.0/ref/Domain.dll
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\bin\Release\net8.0\Domain.deps.json
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\bin\Release\net8.0\Domain.dll
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\bin\Release\net8.0\Domain.pdb
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\obj\Release\net8.0\Domain.csproj.AssemblyReference.cache
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\obj\Release\net8.0\Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\obj\Release\net8.0\Domain.AssemblyInfoInputs.cache
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\obj\Release\net8.0\Domain.AssemblyInfo.cs
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\obj\Release\net8.0\Domain.csproj.CoreCompileInputs.cache
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\obj\Release\net8.0\Domain.sourcelink.json
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\obj\Release\net8.0\Domain.dll
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\obj\Release\net8.0\refint\Domain.dll
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\obj\Release\net8.0\Domain.pdb
+C:\BakkalCRM\BakkalCRM\src\bakkalProgram\Domain\obj\Release\net8.0\ref\Domain.dll

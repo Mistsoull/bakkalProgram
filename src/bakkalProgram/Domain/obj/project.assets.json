@@ -1088,24 +1088,32 @@
     ]
   },
   "packageFolders": {
-    "/Users/ugurcancam/.nuget/packages/": {}
+    "C:\\Users\\Uğurcan\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/Domain.csproj",
+      "projectUniqueName": "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Domain\\Domain.csproj",
       "projectName": "Domain",
-      "projectPath": "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/Domain.csproj",
-      "packagesPath": "/Users/ugurcancam/.nuget/packages/",
-      "outputPath": "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/",
+      "projectPath": "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Domain\\Domain.csproj",
+      "packagesPath": "C:\\Users\\Uğurcan\\.nuget\\packages\\",
+      "outputPath": "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Domain\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/Users/ugurcancam/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\Uğurcan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1150,22 +1158,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[8.0.18, 8.0.18]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[8.0.18, 8.0.18]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.303/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

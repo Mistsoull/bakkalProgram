@@ -1,33 +1,40 @@
 {
   "format": 1,
   "restore": {
-    "/Users/ugurcancam/Desktop/Adsız/tests/BakkalProgram.Application.Tests/BakkalProgram.Application.Tests.csproj": {}
+    "C:\\BakkalCRM\\BakkalCRM\\tests\\BakkalProgram.Application.Tests\\BakkalProgram.Application.Tests.csproj": {}
   },
   "projects": {
-    "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Application/Application.csproj": {
+    "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Application\\Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Application/Application.csproj",
+        "projectUniqueName": "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Application\\Application.csproj",
         "projectName": "Application",
-        "projectPath": "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Application/Application.csproj",
-        "packagesPath": "/Users/ugurcancam/.nuget/packages/",
-        "outputPath": "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Application/obj/",
+        "projectPath": "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Application\\Application.csproj",
+        "packagesPath": "C:\\Users\\Uğurcan\\.nuget\\packages\\",
+        "outputPath": "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Application\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/ugurcancam/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Uğurcan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/Domain.csproj": {
-                "projectPath": "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/Domain.csproj"
+              "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Domain\\Domain.csproj": {
+                "projectPath": "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Domain\\Domain.csproj"
               }
             }
           }
@@ -104,41 +111,38 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.18, 8.0.18]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.18, 8.0.18]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.303/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/Domain.csproj": {
+    "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Domain\\Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/Domain.csproj",
+        "projectUniqueName": "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Domain\\Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/Domain.csproj",
-        "packagesPath": "/Users/ugurcancam/.nuget/packages/",
-        "outputPath": "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Domain/obj/",
+        "projectPath": "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Domain\\Domain.csproj",
+        "packagesPath": "C:\\Users\\Uğurcan\\.nuget\\packages\\",
+        "outputPath": "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Domain\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/ugurcancam/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Uğurcan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -183,49 +187,46 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.18, 8.0.18]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.18, 8.0.18]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.303/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/Users/ugurcancam/Desktop/Adsız/tests/BakkalProgram.Application.Tests/BakkalProgram.Application.Tests.csproj": {
+    "C:\\BakkalCRM\\BakkalCRM\\tests\\BakkalProgram.Application.Tests\\BakkalProgram.Application.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/ugurcancam/Desktop/Adsız/tests/BakkalProgram.Application.Tests/BakkalProgram.Application.Tests.csproj",
+        "projectUniqueName": "C:\\BakkalCRM\\BakkalCRM\\tests\\BakkalProgram.Application.Tests\\BakkalProgram.Application.Tests.csproj",
         "projectName": "BakkalProgram.Application.Tests",
-        "projectPath": "/Users/ugurcancam/Desktop/Adsız/tests/BakkalProgram.Application.Tests/BakkalProgram.Application.Tests.csproj",
-        "packagesPath": "/Users/ugurcancam/.nuget/packages/",
-        "outputPath": "/Users/ugurcancam/Desktop/Adsız/tests/BakkalProgram.Application.Tests/obj/",
+        "projectPath": "C:\\BakkalCRM\\BakkalCRM\\tests\\BakkalProgram.Application.Tests\\BakkalProgram.Application.Tests.csproj",
+        "packagesPath": "C:\\Users\\Uğurcan\\.nuget\\packages\\",
+        "outputPath": "C:\\BakkalCRM\\BakkalCRM\\tests\\BakkalProgram.Application.Tests\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/ugurcancam/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Uğurcan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Application/Application.csproj": {
-                "projectPath": "/Users/ugurcancam/Desktop/Adsız/src/bakkalProgram/Application/Application.csproj"
+              "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Application\\Application.csproj": {
+                "projectPath": "C:\\BakkalCRM\\BakkalCRM\\src\\bakkalProgram\\Application\\Application.csproj"
               }
             }
           }
@@ -294,22 +295,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.18, 8.0.18]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.18, 8.0.18]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.303/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

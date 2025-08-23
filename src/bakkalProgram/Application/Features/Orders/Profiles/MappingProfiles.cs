@@ -7,6 +7,7 @@ using AutoMapper;
 using NArchitecture.Core.Application.Responses;
 using Domain.Entities;
 using NArchitecture.Core.Persistence.Paging;
+using Application.Features.Orders.Queries.GetListGetTodaysOrdersList;
 
 namespace Application.Features.Orders.Profiles;
 
@@ -27,5 +28,10 @@ public class MappingProfiles : Profile
 
         CreateMap<Order, GetListOrderListItemDto>();
         CreateMap<IPaginate<Order>, GetListResponse<GetListOrderListItemDto>>();
+
+        CreateMap<Order, GetTodaysOrdersListItemDto>()
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null ? src.Product.Name : src.ProductName))
+            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.Name : src.CustomerName))
+            .ForMember(dest => dest.CustomerSurname, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.Surname : src.CustomerSurname));
     }
 }

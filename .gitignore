@@ -1,0 +1,49 @@
+## Visual Studio Code
+.vscode/
+
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+
+## .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+**/Properties/launchSettings.json
+
+## Package Files
+*.nupkg
+*.nuget.props
+*.nuget.targets
+
+## Logs
+logs/
+*.log
+
+## Publish folder
+publish/
+
+## Environment specific files
+appsettings.Production.json
+appsettings.Local.json
+
+## Sensitive data
+*.pfx
+*.p12
+
+## Temporary files
+*.tmp
+*.swp
+*~
+
+## OS Files
+.DS_Store
+Thumbs.db

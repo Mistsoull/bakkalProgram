@@ -245,7 +245,7 @@
                   <div class="row align-items-center">
                     <div class="col-8">
                       <h4 class="card-title mb-9 fw-semibold">Bugünkü Sipariş Sayısı</h4>
-                      <h4 class="fw-semibold mb-3">5</h4>
+                      <h4 class="fw-semibold mb-3" id="todayOrderCount">Yükleniyor...</h4>
                       <div class="d-flex align-items-center mb-3">
                         <span class="me-1 rounded-circle bg-success-subtle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
                           <i class="ti ti-arrow-up-left text-success"></i>
@@ -302,7 +302,7 @@
                         <span class="me-1 rounded-circle bg-success-subtle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
                           <i class="ti ti-arrow-up-left text-success"></i>
                         </span>
-                        <p class="text-dark me-1 fs-3 mb-0">Bu hafta eklenen müşteri sayısı</p>
+                        <p class="text-dark me-1 fs-3 mb-0">Bu hafta eklenen müşteri</p>
                       </div>
                     </div>
                     <div class="col-4">
@@ -349,124 +349,8 @@
                           </th>
                         </tr>
                       </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-2.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Ahmet Yılmaz</h6>
-                                <span class="fw-normal">Çalışan</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Ekmek</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">5 adet</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-warning-subtle text-warning">Bekliyor</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-check"></i>Teslim Et
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-3.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Ayşe Kaya</h6>
-                                <span class="fw-normal">Müşteri</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Özel Gazete</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">1 adet</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-success-subtle text-success">Getirildi</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-check"></i>Teslim Et
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="d-flex align-items-center">
-                              <img src="../assets/images/profile/user-4.jpg" class="rounded-circle" width="40" height="40">
-                              <div class="ms-3">
-                                <h6 class="fs-4 fw-semibold mb-0">Mehmet Özkan</h6>
-                                <span class="fw-normal">Çalışan</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">Çikolata</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 fw-normal">3 adet</p>
-                          </td>
-                          <td>
-                            <span class="badge bg-warning-subtle text-warning">Bekliyor</span>
-                          </td>
-                          <td>
-                            <div class="dropdown dropstart">
-                              <a href="javascript:void(0)" class="text-muted" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical fs-6"></i>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-eye"></i>Görüntüle
-                                  </a>
-                                </li>
-                                <li>
-                                  <a class="dropdown-item d-flex align-items-center gap-3" href="javascript:void(0)">
-                                    <i class="fs-4 ti ti-check"></i>Teslim Et
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
+                      <tbody id="todayOrdersTableBody">
+                        <!-- Dinamik içerik buraya yüklenecek -->
                       </tbody>
                     </table>
                   </div>
@@ -489,6 +373,28 @@
   
   <!-- solar icons -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+  
+  <!-- Dashboard Services -->
+  <script src="../assets/js/dashboardUtils.js"></script>
+  <script src="../assets/js/dashboardService.js"></script>
+  <script src="../assets/js/dashboardUI.js"></script>
+  
+  <!-- Dashboard Initialization -->
+  <script>
+    // Dashboard'u sayfa yüklendiğinde başlat
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        await dashboardUI.initialize();
+      } catch (error) {
+        console.error('Dashboard başlatma hatası:', error);
+      }
+    });
+
+    // Sayfa kapatılmadan önce temizlik yap
+    window.addEventListener('beforeunload', function() {
+      dashboardUI.destroy();
+    });
+  </script>
 </body>
 
 </html>

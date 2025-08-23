@@ -6,6 +6,8 @@ using Application.Features.Orders.Queries.GetList;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using Microsoft.AspNetCore.Mvc;
+using Application.Features.Orders.Queries.GetTotalOrderCountByDay;
+using Application.Features.Orders.Queries.GetListGetTodaysOrdersList;
 
 namespace WebAPI.Controllers;
 
@@ -55,6 +57,25 @@ public class OrdersController : BaseController
         GetListOrderQuery query = new() { PageRequest = pageRequest };
 
         GetListResponse<GetListOrderListItemDto> response = await Mediator.Send(query);
+
+        return Ok(response);
+    }
+
+    [HttpGet("GetTotalOrderCountByDay")]
+    public async Task<ActionResult<GetTotalOrderCountByDayResponse>> GetTotalOrderCountByDay([FromQuery] DateTime date)
+    {
+        GetTotalOrderCountByDayQuery query = new() { Date = date };
+
+        GetTotalOrderCountByDayResponse response = await Mediator.Send(query);
+
+        return Ok(response);
+    }
+    [HttpGet("GetTodaysOrders")]
+    public async Task<ActionResult<List<GetTodaysOrdersListItemDto>>> GetTodaysOrders([FromQuery] DateTime date)
+    {
+        GetTodaysOrdersQuery query = new() { Date = date };
+
+        List<GetTodaysOrdersListItemDto> response = await Mediator.Send(query);
 
         return Ok(response);
     }

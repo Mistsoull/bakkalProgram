@@ -4,7 +4,7 @@
  */
 
 // Backend API'nin temel URL'i
-const BASE_URL = 'http://localhost:5278/api/';
+const BASE_URL = 'http://ilgazmountainbakkal.com.tr/api/';
 
 /**
  * Sayfalama destekli genel GET isteği işleyicisi

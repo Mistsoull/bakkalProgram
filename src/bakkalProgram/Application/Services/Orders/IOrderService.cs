@@ -7,6 +7,8 @@ namespace Application.Services.Orders;
 
 public interface IOrderService
 {
+    Task<int> GetTotalOrderCountByDayAsync(DateTime date);
+    Task<List<Order>> GetTodaysOrdersAsync(DateTime date);
     Task<Order?> GetAsync(
         Expression<Func<Order, bool>> predicate,
         Func<IQueryable<Order>, IIncludableQueryable<Order, object>>? include = null,
@@ -27,4 +29,5 @@ public interface IOrderService
     Task<Order> AddAsync(Order order);
     Task<Order> UpdateAsync(Order order);
     Task<Order> DeleteAsync(Order order, bool permanent = false);
+
 }

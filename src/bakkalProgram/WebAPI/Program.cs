@@ -57,24 +57,13 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// if (app.Environment.IsProduction())
-//     app.ConfigureCustomExceptionMiddleware();
+if (app.Environment.IsProduction())
+    app.ConfigureCustomExceptionMiddleware();
 
 app.UseDbMigrationApplier();
 
-// Use permissive CORS for development
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors();
-}
-else
-{
-    const string webApiConfigurationSection = "WebAPIConfiguration";
-    WebApiConfiguration webApiConfiguration =
-        app.Configuration.GetSection(webApiConfigurationSection).Get<WebApiConfiguration>()
-        ?? throw new InvalidOperationException($"\"{webApiConfigurationSection}\" section cannot found in configuration.");
-    app.UseCors(opt => opt.WithOrigins(webApiConfiguration.AllowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
-}
+// Use CORS for all environments
+app.UseCors();
 
 app.MapControllers();
 
