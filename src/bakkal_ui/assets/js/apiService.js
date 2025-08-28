@@ -4,8 +4,8 @@
  */
 
 // Backend API'nin temel URL'i
-// const BASE_URL = 'http://ilgazmountainbakkal.com.tr/api/';
-  const BASE_URL = 'http://localhost:5278/api/'; // Geliştirme için localhost
+const BASE_URL = 'http://ilgazmountainbakkal.com.tr/api/';
+//  const BASE_URL = 'http://localhost:5278/api/'; // Geliştirme için localhost
 
 /**
  * Sayfalama destekli genel GET isteği işleyicisi
@@ -172,14 +172,14 @@ window.apiService = {
     fetchPut,
     fetchDelete,
     fetchGetById,
-    
+
     // Yaygın sayfalama senaryoları için kolaylık metodları
-    fetchGetAll: (endpoint, additionalParams = {}) => fetchGet(endpoint, { 
-        pageIndex: 0, 
+    fetchGetAll: (endpoint, additionalParams = {}) => fetchGet(endpoint, {
+        pageIndex: 0,
         pageSize: 1000, // Tüm öğeleri almak için büyük sayfa boyutu
-        additionalParams 
+        additionalParams
     }),
-    
+
     fetchGetPaged: (endpoint, pageIndex = 0, pageSize = 10, additionalParams = {}) => fetchGet(endpoint, {
         pageIndex,
         pageSize,

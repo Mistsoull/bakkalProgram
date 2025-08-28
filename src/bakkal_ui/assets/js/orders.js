@@ -559,8 +559,12 @@ async function loadOrders() {
                 const rowData = createOrderRowData(orderGroup);
                 ordersDataTable.row.add(rowData);
             });
+            
+            // Ürün özetini güncelle
+            updateProductSummary(orders);
         } else {
             showEmptyState();
+            clearProductSummary();
         }
 
         // DataTable'ı yeniden çiz
@@ -592,8 +596,113 @@ async function loadOrders() {
         }
         
         showErrorState();
+        clearProductSummary();
         // Kullanıcı dostu hata mesajı göster
         showToast('error', 'Hata!', `Siparişler yüklenirken bir hata oluştu: ${errorMessage}`);
+    }
+}
+
+/**
+ * Ürün özetini hesaplar ve gösterir
+ * @param {Array} orders - Tüm siparişler
+ */
+function updateProductSummary(orders) {
+    const productSummaryDiv = document.getElementById('product-summary');
+    if (!productSummaryDiv) {
+        console.warn('Product summary container bulunamadı');
+        return;
+    }
+
+    // Ürünlere göre toplama yap
+    const productTotals = {};
+    
+    orders.forEach(order => {
+        const productName = order.productName;
+        const quantity = parseInt(order.quantity) || 0;
+        
+        if (productTotals[productName]) {
+            productTotals[productName] += quantity;
+        } else {
+            productTotals[productName] = quantity;
+        }
+    });
+
+    // Toplam ürün sayısını hesapla
+    const totalProducts = Object.keys(productTotals).length;
+    const totalQuantity = Object.values(productTotals).reduce((sum, qty) => sum + qty, 0);
+
+    // HTML oluştur
+    let summaryHtml = '';
+    
+    // Genel özet kartı
+    summaryHtml += `
+        <div class="col-lg-12 mb-3">
+            <div class="alert alert-info mb-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Genel Özet:</strong> Toplam <strong>${totalProducts}</strong> farklı ürün için <strong>${totalQuantity}</strong> adet sipariş bulunmaktadır.
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Her ürün için kart oluştur
+    const sortedProducts = Object.entries(productTotals)
+        .sort(([,a], [,b]) => b - a); // Miktar bazında azalan sıralama
+
+    sortedProducts.forEach(([productName, totalQty], index) => {
+        const percentage = ((totalQty / totalQuantity) * 100).toFixed(1);
+        const isTopProduct = index < 3; // İlk 3 ürün için özel stil
+        
+        summaryHtml += `
+            <div class="col-lg-4 col-md-6 mb-3">
+                <div class="card ${isTopProduct ? 'border-success' : 'border-light'} h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            ${isTopProduct ? 
+                                `<i class="fas fa-trophy text-warning fs-2 mb-2"></i>` : 
+                                `<i class="fas fa-cube text-primary fs-2 mb-2"></i>`
+                            }
+                        </div>
+                        <h6 class="card-title fw-semibold text-truncate" title="${escapeHtml(productName)}">
+                            ${escapeHtml(productName)}
+                        </h6>
+                        <div class="mt-3">
+                            <h4 class="fw-bold text-primary mb-1">${totalQty} adet</h4>
+                            <small class="text-muted">Toplam siparişlerin %${percentage}'i</small>
+                        </div>
+                        <div class="progress mt-2" style="height: 6px;">
+                            <div class="progress-bar ${isTopProduct ? 'bg-success' : 'bg-primary'}" 
+                                 style="width: ${percentage}%"></div>
+                        </div>
+                        ${isTopProduct ? 
+                            `<span class="badge bg-success-subtle text-success mt-2">
+                                <i class="fas fa-star me-1"></i>En Çok Sipariş Edilen
+                             </span>` : ''
+                        }
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    productSummaryDiv.innerHTML = summaryHtml;
+}
+
+/**
+ * Ürün özetini temizler
+ */
+function clearProductSummary() {
+    const productSummaryDiv = document.getElementById('product-summary');
+    if (productSummaryDiv) {
+        productSummaryDiv.innerHTML = `
+            <div class="col-12 text-center text-muted">
+                <i class="fas fa-box-open fa-2x mb-3"></i>
+                <p>Henüz sipariş bulunmuyor.</p>
+            </div>
+        `;
     }
 }
 
@@ -824,11 +933,8 @@ function handleAddOrderForm(event) {
         .then(response => {
             console.log('Sipariş başarıyla eklendi:', response);
             
-            // DataTable'a yeni siparişi ekle
-            if (ordersDataTable) {
-                const newRowData = createOrderRowData(response);
-                ordersDataTable.row.add(newRowData).draw(false);
-            }
+            // Tüm siparişleri yeniden yükle (ürün özetini de güncellemek için)
+            loadOrders();
             
             // Formu temizle ve modalı kapat
             addOrderForm.reset();
@@ -922,28 +1028,8 @@ async function deleteOrder(orderId, customerName) {
         
         // DataTable'dan satırı kaldır
         if (ordersDataTable) {
-            // Silinen siparişin satırını bul ve kaldır
-            const table = ordersDataTable;
-            let rowRemoved = false;
-            
-            table.rows().every(function(rowIdx, tableLoop, rowLoop) {
-                const rowData = this.data();
-                // İşlemler sütunundaki butonlardan ID'yi çek
-                if (rowData[5] && rowData[5].includes(orderId)) {
-                    this.remove();
-                    rowRemoved = true;
-                    return false; // Loop'u durdur
-                }
-            });
-            
-            if (rowRemoved) {
-                table.draw(false); // Sayfa numarasını koruyarak yeniden çiz
-                console.log('Sipariş tablodan kaldırıldı');
-            } else {
-                console.warn('Silinecek sipariş tabloda bulunamadı, tabloyu yeniliyoruz');
-                // Bulunamazsa tüm tabloyu yenile
-                loadOrders();
-            }
+            // Tüm tabloyu yeniden yükle (ürün özetini de güncellemek için)
+            loadOrders();
         }
         
     } catch (error) {
