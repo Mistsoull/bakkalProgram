@@ -109,6 +109,94 @@ class DashboardService {
             return false;
         }
     }
+
+    /**
+     * Toplam veresiye borcu bilgilerini getirir
+     * @returns {Promise<Object>} Veresiye istatistikleri
+     */
+    async getCreditStats() {
+        try {
+            console.log('getCreditStats çağrıldı, API isteği başlatılıyor...');
+            
+            // apiService kullan (eğer mevcut ise)
+            let response;
+            if (window.apiService && window.apiService.fetchGetAll) {
+                console.log('apiService kullanılıyor...');
+                response = await window.apiService.fetchGetAll('OnCredits');
+            } else {
+                // OnCredits için pagination parametreleri ekle (apiService ile aynı format)
+                const paginationParams = {
+                    pageIndex: 0,
+                    pageSize: 1000  // Tüm veriler için büyük bir değer
+                };
+                
+                response = await this.makeRequest('OnCredits', paginationParams);
+            }
+            
+            console.log('OnCredits API yanıtı:', response);
+            
+            let credits = [];
+            if (response && response.items && Array.isArray(response.items)) {
+                credits = response.items;
+                console.log('API response.items kullanıldı, array uzunluğu:', credits.length);
+            } else if (Array.isArray(response)) {
+                credits = response;
+                console.log('API response direkt array, uzunluğu:', credits.length);
+            } else {
+                console.warn('API yanıtı beklenmedik formatta:', response);
+            }
+
+            console.log('İşlenecek veresiye sayısı:', credits.length);
+            console.log('İlk 3 veresiye örneği:', credits.slice(0, 3));
+
+            // Veresiye istatistiklerini hesapla
+            let totalAmount = 0;
+            let paidAmount = 0;
+            let unpaidAmount = 0;
+            let totalCredits = credits.length;
+            let paidCredits = 0;
+            let unpaidCredits = 0;
+
+            credits.forEach(credit => {
+                const amount = parseFloat(credit.totalAmount) || 0;
+                totalAmount += amount;
+
+                console.log(`Veresiye ID: ${credit.id}, Tutar: ${amount}, Ödendi: ${credit.isPaid}`);
+
+                if (credit.isPaid) {
+                    paidAmount += amount;
+                    paidCredits++;
+                } else {
+                    unpaidAmount += amount;
+                    unpaidCredits++;
+                }
+            });
+
+            const stats = {
+                totalAmount,
+                paidAmount,
+                unpaidAmount,
+                totalCredits,
+                paidCredits,
+                unpaidCredits
+            };
+
+            console.log('Hesaplanan veresiye istatistikleri:', stats);
+            this.config?.log('Veresiye istatistikleri:', stats);
+            return stats;
+        } catch (error) {
+            console.error('getCreditStats hatası:', error);
+            this.config?.error('Veresiye istatistikleri alınırken hata', error);
+            return {
+                totalAmount: 0,
+                paidAmount: 0,
+                unpaidAmount: 0,
+                totalCredits: 0,
+                paidCredits: 0,
+                unpaidCredits: 0
+            };
+        }
+    }
 }
 
 // Global erişim için dashboard service instance'ı oluştur

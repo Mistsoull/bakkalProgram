@@ -4,7 +4,8 @@
  */
 
 // Backend API'nin temel URL'i
-const BASE_URL = 'http://ilgazmountainbakkal.com.tr/api/';
+// const BASE_URL = 'http://ilgazmountainbakkal.com.tr/api/';
+  const BASE_URL = 'http://localhost:5278/api/'; // Geliştirme için localhost
 
 /**
  * Sayfalama destekli genel GET isteği işleyicisi
@@ -135,12 +136,42 @@ async function fetchDelete(endpoint) {
     }
 }
 
+/**
+ * ID'ye göre tek kayıt getiren GET isteği işleyicisi
+ * @param {string} endpoint - Başında slash olmayan API endpoint'i (ör: 'Orders')
+ * @param {string} id - Kaydın ID'si (GUID)
+ * @returns {Promise<any>} - Ayrıştırılmış JSON yanıtı
+ */
+async function fetchGetById(endpoint, id) {
+    try {
+        const url = `${BASE_URL}${endpoint}/${id}`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP hatası! durum: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error(`${endpoint}/${id} için GET isteği başarısız:`, error);
+        throw error;
+    }
+}
+
 // Modül kullanımı için fonksiyonları dışa aktar
 window.apiService = {
     fetchGet,
     fetchPost,
     fetchPut,
     fetchDelete,
+    fetchGetById,
     
     // Yaygın sayfalama senaryoları için kolaylık metodları
     fetchGetAll: (endpoint, additionalParams = {}) => fetchGet(endpoint, { 

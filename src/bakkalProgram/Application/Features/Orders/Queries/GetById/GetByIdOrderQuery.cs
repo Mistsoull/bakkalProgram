@@ -3,6 +3,7 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Orders.Queries.GetById;
 
@@ -25,7 +26,10 @@ public class GetByIdOrderQuery : IRequest<GetByIdOrderResponse>
 
         public async Task<GetByIdOrderResponse> Handle(GetByIdOrderQuery request, CancellationToken cancellationToken)
         {
-            Order? order = await _orderRepository.GetAsync(predicate: o => o.Id == request.Id, cancellationToken: cancellationToken);
+            Order? order = await _orderRepository.GetAsync(
+                predicate: o => o.Id == request.Id, 
+                include: o => o.Include(x => x.Product).Include(x => x.Customer),
+                cancellationToken: cancellationToken);
             await _orderBusinessRules.OrderShouldExistWhenSelected(order);
 
             GetByIdOrderResponse response = _mapper.Map<GetByIdOrderResponse>(order);

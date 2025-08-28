@@ -9,6 +9,7 @@ public class GetByIdOnCreditResponse : IResponse
     public string? EmployeeSurname { get; set; }
     public string? CustomerName { get; set; }
     public string? CustomerSurname { get; set; }
+    public DateTime CreatedDate { get; set; }
     public string? Note { get; set; }
     public bool IsPaid { get; set; }
     public double TotalAmount { get; set; }

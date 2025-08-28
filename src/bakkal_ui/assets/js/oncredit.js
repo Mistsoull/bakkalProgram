@@ -50,10 +50,144 @@ const avatarImages = [
 ];
 
 /**
+ * HTML karakterlerini güvenli hale getir (XSS koruması)
+ * @param {string} text - Temizlenecek metin
+ * @returns {string} - Güvenli metin
+ */
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * Tarihi kullanıcı dostu formatta göster
+ * @param {string} dateString - ISO tarih string'i
+ * @returns {string} - Formatlanmış tarih
+ */
+function formatDate(dateString) {
+    if (!dateString) return '';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('tr-TR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+    } catch (error) {
+        console.warn('Tarih format hatası:', error);
+        return dateString;
+    }
+}
+
+/**
  * Rastgele avatar resmi döndürür
  */
 function getRandomAvatar() {
     return avatarImages[Math.floor(Math.random() * avatarImages.length)];
+}
+
+/**
+ * Aynı kişiden birden fazla veresiye varsa bunları gruplar
+ * @param {Array} credits - Veresiye listesi
+ * @returns {Array} - Gruplandırılmış veresiye listesi
+ */
+function groupCreditsByPerson(credits) {
+    const groupedCredits = {};
+    
+    credits.forEach(credit => {
+        // Kişi tipine göre anahtar oluştur (müşteri/çalışan + ad + soyad)
+        const personType = credit.customerId ? 'customer' : 'employee';
+        const personName = credit.customerId ? credit.customerName : credit.employeeName;
+        const personSurname = credit.customerId ? credit.customerSurname : credit.employeeSurname;
+        const personKey = `${personType}_${personName}_${personSurname || ''}`.toLowerCase();
+        
+        if (!groupedCredits[personKey]) {
+            groupedCredits[personKey] = {
+                id: credit.id, // İlk veresiyenin ID'sini kullan
+                personType: personType,
+                personName: personName,
+                personSurname: personSurname,
+                customerId: credit.customerId,
+                employeeId: credit.employeeId,
+                credits: [],
+                totalAmount: 0,
+                allPaid: true,
+                unpaidAmount: 0,
+                paidAmount: 0
+            };
+        }
+        
+        const group = groupedCredits[personKey];
+        group.credits.push(credit);
+        group.totalAmount += credit.totalAmount;
+        
+        // Ödeme durumu kontrolü
+        if (credit.isPaid) {
+            group.paidAmount += credit.totalAmount;
+        } else {
+            group.allPaid = false;
+            group.unpaidAmount += credit.totalAmount;
+        }
+    });
+    
+    return Object.values(groupedCredits);
+}
+
+/**
+ * Gruplandırılmış veresiyeler için not listesi oluştur
+ * @param {Array} credits - Aynı kişiye ait veresiyeler
+ * @returns {string} - HTML formatında not listesi
+ */
+function createNotesList(credits) {
+    const notes = credits
+        .filter(credit => credit.note && credit.note.trim())
+        .map(credit => escapeHtml(credit.note.trim()));
+    
+    if (notes.length === 0) {
+        return '<span class="text-muted">Not yok</span>';
+    }
+    
+    if (notes.length === 1) {
+        return notes[0];
+    }
+    
+    const uniqueNotes = [...new Set(notes)];
+    return `<div class="notes-list">${uniqueNotes.map((note, index) => `${index + 1}. ${note}`).join('<br>')}</div>`;
+}
+
+/**
+ * Gruplandırılmış veresiyeler için karma durum badge'i
+ * @param {boolean} allPaid - Tüm veresiyeler ödenmiş mi?
+ * @param {number} creditCount - Toplam veresiye sayısı
+ * @param {Array} credits - Veresiye listesi (detaylı durum kontrolü için)
+ * @returns {string} - HTML badge
+ */
+function getMixedPaymentStatusBadge(allPaid, creditCount, credits = []) {
+    if (creditCount === 1) {
+        // Tek veresiye varsa normal badge'i kullan
+        return getPaymentStatusBadge(allPaid);
+    }
+    
+    // Birden fazla veresiye için detaylı durum analizi
+    let paidCount = 0;
+    
+    if (credits.length > 0) {
+        paidCount = credits.filter(credit => credit.isPaid).length;
+    }
+    
+    // Ödeme durumu badge'i
+    if (paidCount === 0) {
+        // Hiçbiri ödenmemiş
+        return '<span class="badge bg-danger-subtle text-danger">Hiçbiri Ödenmedi</span>';
+    } else if (paidCount === creditCount) {
+        // Hepsi ödenmiş
+        return '<span class="badge bg-success-subtle text-success">Tümü Ödendi</span>';
+    } else {
+        // Kısmi ödeme
+        return `<span class="badge bg-warning-subtle text-warning">Kısmi Ödeme (${paidCount}/${creditCount})</span>`;
+    }
 }
 
 /**
@@ -462,102 +596,467 @@ async function loadOnCredits() {
         if (onCreditDataTable) {
             onCreditDataTable.clear();
         }
-        
-        // Her veresiye kaydı için DataTable row'u oluştur
-        onCredits.forEach(onCredit => {
-            const avatarImg = getRandomAvatar();
+
+        if (onCredits && onCredits.length > 0) {
+            // Veresiyeleri kişilere göre gruplandır
+            const groupedCredits = groupCreditsByPerson(onCredits);
+            console.log('Gruplandırılmış veresiyeler:', groupedCredits);
             
-            // Kişi bilgisini belirle (Employee veya Customer)
-            let personName = '';
-            let personSubtitle = '';
-            let hasEmployee = false;
-            let hasCustomer = false;
-            
-            if (onCredit.employeeName) {
-                hasEmployee = true;
-                personName = onCredit.employeeSurname ? 
-                    `${onCredit.employeeName} ${onCredit.employeeSurname}` : 
-                    onCredit.employeeName;
-                personSubtitle = 'Otel Çalışanı';
-            } else if (onCredit.customerName) {
-                hasCustomer = true;
-                personName = onCredit.customerSurname ? 
-                    `${onCredit.customerName} ${onCredit.customerSurname}` : 
-                    onCredit.customerName;
-                personSubtitle = 'Müşteri';
-            } else {
-                personName = 'Bilinmiyor';
-                personSubtitle = 'Tanımlanmamış';
-            }
-            
-            // DataTable row data
-            const rowData = [
-                // Kişi
-                `<div class="d-flex align-items-center">
-                    <img src="${avatarImg}" class="rounded-circle" width="40" height="40" alt="Person Avatar">
-                    <div class="ms-3">
-                        <h6 class="fs-4 fw-semibold mb-0">${escapeHtml(personName)}</h6>
-                        <span class="fw-normal text-muted">${escapeHtml(personSubtitle)}</span>
-                    </div>
-                </div>`,
-                
-                // Tip
-                getPersonTypeBadge(hasEmployee, hasCustomer),
-                
-                // Tutar
-                `<h6 class="fs-4 fw-semibold mb-0 ${onCredit.isPaid ? 'text-success' : 'text-warning'}">${formatCurrency(onCredit.totalAmount)}</h6>`,
-                
-                // Not
-                onCredit.note ? 
-                    `<p class="mb-0 fw-normal">${escapeHtml(onCredit.note)}</p>` : 
-                    '<span class="text-muted">Not yok</span>',
-                
-                // Durum
-                getPaymentStatusBadge(onCredit.isPaid),
-                
-                // İşlemler
-                `<div class="d-flex gap-1">
-                    <button class="btn btn-outline-warning btn-sm payment-toggle-btn" 
-                            data-id="${onCredit.id}" 
-                            data-status="${!onCredit.isPaid}"
-                            title="${onCredit.isPaid ? 'Ödenmedi Yap' : 'Ödendi Yap'}">
-                        <i class="ti ti-${onCredit.isPaid ? 'refresh' : 'check'} fs-6"></i>
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm delete-btn" 
-                            data-id="${onCredit.id}" 
-                            title="Sil">
-                        <i class="ti ti-trash fs-6"></i>
-                    </button>
-                </div>`
-            ];
-            
-            // DataTable'a row ekle
-            if (onCreditDataTable) {
+            // Her gruplandırılmış veresiye için satır verisi oluştur ve tabloya ekle
+            groupedCredits.forEach(creditGroup => {
+                const rowData = createOnCreditRowData(creditGroup);
                 onCreditDataTable.row.add(rowData);
-            }
-        });
-        
-        // DataTable'ı yeniden çiz
-        if (onCreditDataTable) {
-            onCreditDataTable.draw();
-            console.log('DataTable yeniden çizildi');
+            });
         }
+
+        // DataTable'ı yeniden çiz
+        onCreditDataTable.draw();
         
-        // Özeti güncelle
-        updateSummary(onCredits);
+        // Özet istatistikleri güncelle
+        updateSummaryStats(onCredits);
         
-        console.log(`${onCredits.length} veresiye kaydı başarıyla DataTable'a yüklendi.`);
+        console.log(`${onCredits.length} veresiye kaydı başarıyla yüklendi.`);
         
     } catch (error) {
         console.error('Veresiye kayıtları yüklenirken hata:', error);
-        showToast('error', 'Hata!', 'Veresiye kayıtları yüklenirken bir hata oluştu: ' + error.message);
+        showErrorToast('Veriler yüklenirken hata oluştu. Lütfen sayfayı yenileyin.');
     }
 }
 
 /**
- * Özet bilgilerini günceller
+ * DataTable için veresiye satır verisi oluştur (hem tek hem de gruplandırılmış veresiyeler için)
+ * @param {Object} creditOrGroup - API'den gelen veresiye verisi veya gruplandırılmış veresiye verisi
+ * @returns {Array} - DataTable satır verisi
  */
-function updateSummary(onCredits) {
+function createOnCreditRowData(creditOrGroup) {
+    console.log('Veresiye verisi:', creditOrGroup);
+    
+    const avatarImg = getRandomAvatar();
+    
+    // Gruplandırılmış veresiye mi yoksa tek veresiye mi kontrol et
+    if (creditOrGroup.credits && Array.isArray(creditOrGroup.credits)) {
+        // Gruplandırılmış veresiye
+        const creditGroup = creditOrGroup;
+        const fullPersonName = creditGroup.personSurname ? 
+            `${creditGroup.personName} ${creditGroup.personSurname}` : 
+            creditGroup.personName;
+        
+        const creditCount = creditGroup.credits.length;
+        const personTypeText = creditGroup.personType === 'employee' ? 'Otel Çalışanı' : 'Müşteri';
+        const statusBadge = getMixedPaymentStatusBadge(creditGroup.allPaid, creditCount, creditGroup.credits);
+        
+        return [
+            // Kişi
+            `<div class="d-flex align-items-center">
+                <img src="${avatarImg}" class="rounded-circle" width="40" height="40" alt="Person Avatar">
+                <div class="ms-3">
+                    <h6 class="fs-4 fw-semibold mb-0">${escapeHtml(fullPersonName)}</h6>
+                    <span class="fw-normal text-muted">${personTypeText} ${creditCount > 1 ? `(${creditCount} veresiye)` : ''}</span>
+                </div>
+            </div>`,
+            
+            // Tip
+            getPersonTypeBadge(creditGroup.personType === 'employee', creditGroup.personType === 'customer'),
+            
+            // Tutar
+            `<div class="d-flex flex-column">
+                <span class="fw-semibold text-primary">₺${creditGroup.totalAmount.toFixed(2)}</span>
+                ${creditCount > 1 ? `<small class="text-muted">${creditCount} adet toplam</small>` : ''}
+            </div>`,
+            
+            // Not (gruplandırılmış)
+            createNotesList(creditGroup.credits),
+            
+            // Durum
+            statusBadge,
+            
+            // İşlemler
+            createGroupActionButtons(creditGroup)
+        ];
+    } else {
+        // Tek veresiye
+        const credit = creditOrGroup;
+        let personName = '';
+        let personSubtitle = '';
+        let hasEmployee = false;
+        let hasCustomer = false;
+        
+        if (credit.employeeName) {
+            hasEmployee = true;
+            personName = credit.employeeSurname ? 
+                `${credit.employeeName} ${credit.employeeSurname}` : 
+                credit.employeeName;
+            personSubtitle = 'Otel Çalışanı';
+        } else if (credit.customerName) {
+            hasCustomer = true;
+            personName = credit.customerSurname ? 
+                `${credit.customerName} ${credit.customerSurname}` : 
+                credit.customerName;
+            personSubtitle = 'Müşteri';
+        } else {
+            personName = 'Bilinmiyor';
+            personSubtitle = 'Tanımlanmamış';
+        }
+
+        return [
+            // Kişi
+            `<div class="d-flex align-items-center">
+                <img src="${avatarImg}" class="rounded-circle" width="40" height="40" alt="Person Avatar">
+                <div class="ms-3">
+                    <h6 class="fs-4 fw-semibold mb-0">${escapeHtml(personName)}</h6>
+                    <span class="fw-normal text-muted">${escapeHtml(personSubtitle)}</span>
+                </div>
+            </div>`,
+            
+            // Tip
+            getPersonTypeBadge(hasEmployee, hasCustomer),
+            
+            // Tutar
+            `<span class="fw-semibold text-primary">₺${credit.totalAmount.toFixed(2)}</span>`,
+            
+            // Not
+            credit.note ? escapeHtml(credit.note) : '<span class="text-muted">Not yok</span>',
+            
+            // Durum
+            getPaymentStatusBadge(credit.isPaid),
+            
+            // İşlemler
+            `<div class="d-flex justify-content-center gap-1">
+                <button class="btn btn-outline-warning btn-sm" onclick="toggleOnCreditStatus('${credit.id}', ${!credit.isPaid})" title="${credit.isPaid ? 'Ödenmedi Yap' : 'Ödendi İşaretle'}">
+                    <i class="fas fa-${credit.isPaid ? 'undo' : 'check'}"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="deleteOnCredit('${credit.id}', '${escapeHtml(personName)}')" title="Sil">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>`
+        ];
+    }
+}
+
+/**
+ * Gruplandırılmış veresiyeler için aksiyon butonları oluştur
+ * @param {Object} creditGroup - Gruplandırılmış veresiye verisi
+ * @returns {string} - HTML buton grubu
+ */
+function createGroupActionButtons(creditGroup) {
+    const creditCount = creditGroup.credits.length;
+    
+    if (creditCount === 1) {
+        // Tek veresiye varsa normal butonları göster
+        const credit = creditGroup.credits[0];
+        return `<div class="d-flex justify-content-center gap-1">
+            <button class="btn btn-outline-warning btn-sm" onclick="toggleOnCreditStatus('${credit.id}', ${!credit.isPaid})" title="${credit.isPaid ? 'Ödenmedi Yap' : 'Ödendi İşaretle'}">
+                <i class="fas fa-${credit.isPaid ? 'undo' : 'check'}"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteOnCredit('${credit.id}', '${escapeHtml(creditGroup.personName)}')" title="Sil">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>`;
+    } else {
+        // Birden fazla veresiye varsa grup işlem butonları göster
+        const creditIds = creditGroup.credits.map(c => c.id).join(',');
+        return `<div class="d-flex justify-content-center gap-1">
+            <button class="btn btn-outline-info btn-sm" onclick="showGroupDetails('${creditIds}')" title="Detayları Göster">
+                <i class="fas fa-eye"></i>
+            </button>
+            <button class="btn btn-outline-warning btn-sm" onclick="toggleGroupPaymentStatus('${creditIds}', true)" title="Tümünü Ödendi İşaretle">
+                <i class="fas fa-check-double"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteOnCreditGroup('${creditIds}', '${escapeHtml(creditGroup.personName)}')" title="Tümünü Sil">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>`;
+    }
+}
+
+/**
+ * Modal içinden tek veresiye ödeme durumunu değiştir
+ * @param {string} creditId - Veresiye ID'si
+ * @param {boolean} isPaid - Ödeme durumu
+ */
+window.toggleSingleCreditFromModal = async function(creditId, isPaid) {
+    console.log('toggleSingleCreditFromModal çağrıldı:', creditId, isPaid);
+    try {
+        await apiService.fetchPut(`OnCredits/${creditId}/toggle-status`, { isPaid });
+        
+        showSuccessToast('Ödeme durumu başarıyla güncellendi!');
+        
+        // Ana tabloyu yeniden yükle
+        await loadOnCredits();
+        
+        // Modal'ı kapat
+        const modal = bootstrap.Modal.getInstance(document.getElementById('groupDetailsModal'));
+        if (modal) {
+            modal.hide();
+        }
+    } catch (error) {
+        console.error('Modal\'dan ödeme durumu güncellenirken hata:', error);
+        showErrorToast('Ödeme durumu güncellenirken hata oluştu!');
+    }
+};
+
+/**
+ * Modal içinden tek veresiye sil
+ * @param {string} creditId - Veresiye ID'si
+ * @param {string} personName - Kişi adı
+ */
+window.deleteSingleCreditFromModal = async function(creditId, personName) {
+    console.log('deleteSingleCreditFromModal çağrıldı:', creditId, personName);
+    if (confirm(`${personName} adlı kişinin bu veresiye kaydını silmek istediğinizden emin misiniz?`)) {
+        try {
+            await apiService.fetchDelete(`OnCredits/${creditId}`);
+            
+            showSuccessToast('Veresiye kaydı başarıyla silindi!');
+            
+            // Ana tabloyu yeniden yükle  
+            await loadOnCredits();
+            
+            // Modal'ı kapat
+            const modal = bootstrap.Modal.getInstance(document.getElementById('groupDetailsModal'));
+            if (modal) {
+                modal.hide();
+            }
+        } catch (error) {
+            console.error('Modal\'dan veresiye silinirken hata:', error);
+            showErrorToast('Veresiye silinirken hata oluştu!');
+        }
+    }
+};
+
+/**
+ * Grup detaylarını göster
+ * @param {string} creditIds - Virgülle ayrılmış veresiye ID'leri
+ */
+window.showGroupDetails = function(creditIds) {
+    const ids = creditIds.split(',');
+    
+    // Modal oluştur
+    const modalHtml = `
+        <div class="modal fade" id="groupDetailsModal" tabindex="-1" aria-labelledby="groupDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="groupDetailsModalLabel">
+                            <i class="fas fa-list-ul me-2"></i>Veresiye Grubu Detayları (${ids.length} veresiye)
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="groupDetailsContent">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                                <p class="mt-2">Veresiye detayları yükleniyor...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                        <button type="button" class="btn btn-success" onclick="toggleGroupPaymentStatus('${creditIds}', true)">
+                            <i class="fas fa-check-double me-1"></i>Tümünü Ödendi İşaretle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Eski modal varsa kaldır
+    const existingModal = document.getElementById('groupDetailsModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Yeni modal ekle
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Modal'ı göster
+    const modal = new bootstrap.Modal(document.getElementById('groupDetailsModal'));
+    modal.show();
+    
+    // Veresiye detaylarını yükle
+    loadGroupDetails(ids);
+};
+
+/**
+ * Grup veresiye detaylarını yükle
+ * @param {Array} creditIds - Veresiye ID'leri array'i
+ */
+async function loadGroupDetails(creditIds) {
+    try {
+        const contentDiv = document.getElementById('groupDetailsContent');
+        let detailsHtml = '<div class="row">';
+        
+        for (let i = 0; i < creditIds.length; i++) {
+            const creditId = creditIds[i];
+            
+            // Her veresiye için ayrı API çağrısı
+            try {
+                const credit = await apiService.fetchGetById('OnCredits', creditId);
+                
+                // Kişi adını belirle
+                let personName = '';
+                let personType = '';
+                if (credit.employeeName) {
+                    personName = credit.employeeSurname ? 
+                        `${credit.employeeName} ${credit.employeeSurname}` : 
+                        credit.employeeName;
+                    personType = 'Otel Çalışanı';
+                } else if (credit.customerName) {
+                    personName = credit.customerSurname ? 
+                        `${credit.customerName} ${credit.customerSurname}` : 
+                        credit.customerName;
+                    personType = 'Müşteri';
+                } else {
+                    personName = 'Bilinmiyor';
+                    personType = 'Tanımlanmamış';
+                }
+                
+                detailsHtml += `
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary-subtle">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-credit-card me-2"></i>Veresiye ${i + 1}
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <strong>Kişi:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        ${escapeHtml(personName)}
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Tip:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="badge ${credit.employeeName ? 'bg-warning' : 'bg-info'}">${personType}</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Tutar:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="fw-bold text-primary">₺${credit.totalAmount.toFixed(2)}</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Tarih:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        ${formatDate(credit.createdDate)}
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Durum:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        ${getPaymentStatusBadge(credit.isPaid)}
+                                    </div>
+                                    ${credit.note ? `
+                                    <div class="col-12">
+                                        <strong>Not:</strong>
+                                        <p class="mb-0 text-muted">${escapeHtml(credit.note)}</p>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                                <div class="mt-3 d-flex gap-2">
+                                    <button class="btn btn-sm ${credit.isPaid ? 'btn-outline-warning' : 'btn-outline-success'}" 
+                                            onclick="toggleSingleCreditFromModal('${credit.id}', ${!credit.isPaid})">
+                                        <i class="fas fa-${credit.isPaid ? 'undo' : 'check'} me-1"></i>
+                                        ${credit.isPaid ? 'Ödenmedi Yap' : 'Ödendi İşaretle'}
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            onclick="deleteSingleCreditFromModal('${credit.id}', '${escapeHtml(personName)}')">
+                                        <i class="fas fa-trash me-1"></i>
+                                        Sil
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error(`Veresiye ${creditId} detayı yüklenemedi:`, error);
+                detailsHtml += `
+                    <div class="col-md-6 mb-3">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Veresiye #${creditId} detayı yüklenemedi.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        detailsHtml += '</div>';
+        contentDiv.innerHTML = detailsHtml;
+        
+    } catch (error) {
+        console.error('Grup detayları yüklenirken hata:', error);
+        document.getElementById('groupDetailsContent').innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Detaylar yüklenirken bir hata oluştu.
+            </div>
+        `;
+    }
+}
+
+/**
+ * Grup ödeme durumunu değiştir
+ * @param {string} creditIds - Virgülle ayrılmış veresiye ID'leri
+ * @param {boolean} isPaid - Ödeme durumu
+ */
+window.toggleGroupPaymentStatus = async function(creditIds, isPaid) {
+    try {
+        const ids = creditIds.split(',');
+        const promises = ids.map(id => apiService.fetchPut(`OnCredits/${id}/toggle-status`, { isPaid }));
+        
+        await Promise.all(promises);
+        
+        showSuccessToast('Grup ödeme durumu başarıyla güncellendi!');
+        await loadOnCredits(); // Tabloyu yeniden yükle
+        
+        // Modal'ı kapat
+        const modal = bootstrap.Modal.getInstance(document.getElementById('groupDetailsModal'));
+        if (modal) {
+            modal.hide();
+        }
+    } catch (error) {
+        console.error('Grup ödeme durumu güncellenirken hata:', error);
+        showErrorToast('Grup ödeme durumu güncellenirken hata oluştu!');
+    }
+};
+
+/**
+ * Grup veresiye sil
+ * @param {string} creditIds - Virgülle ayrılmış veresiye ID'leri
+ * @param {string} personName - Kişi adı
+ */
+window.deleteOnCreditGroup = async function(creditIds, personName) {
+    const ids = creditIds.split(',');
+    
+    if (confirm(`${personName} adlı kişinin ${ids.length} adet veresiye kaydını silmek istediğinizden emin misiniz?`)) {
+        try {
+            const promises = ids.map(id => apiService.fetchDelete(`OnCredits/${id}`));
+            
+            await Promise.all(promises);
+            
+            showSuccessToast('Grup veresiye kayıtları başarıyla silindi!');
+            await loadOnCredits(); // Tabloyu yeniden yükle
+        } catch (error) {
+            console.error('Grup veresiye silinirken hata:', error);
+            showErrorToast('Grup veresiye silinirken hata oluştu!');
+        }
+    }
+};
+
+/**
+ * Özet istatistikleri güncelle
+ * @param {Array} onCredits - Veresiye listesi
+ */
+function updateSummaryStats(onCredits) {
     let totalAmount = 0;
     let paidAmount = 0;
     let unpaidAmount = 0;
@@ -573,9 +1072,16 @@ function updateSummary(onCredits) {
         }
     });
     
-    totalAmountElement.textContent = formatCurrency(totalAmount);
-    paidAmountElement.textContent = formatCurrency(paidAmount);
-    unpaidAmountElement.textContent = formatCurrency(unpaidAmount);
+    // Eğer özet elementleri varsa güncelle
+    if (typeof totalAmountElement !== 'undefined' && totalAmountElement) {
+        totalAmountElement.textContent = formatCurrency(totalAmount);
+    }
+    if (typeof paidAmountElement !== 'undefined' && paidAmountElement) {
+        paidAmountElement.textContent = formatCurrency(paidAmount);
+    }
+    if (typeof unpaidAmountElement !== 'undefined' && unpaidAmountElement) {
+        unpaidAmountElement.textContent = formatCurrency(unpaidAmount);
+    }
 }
 
 /**
@@ -980,3 +1486,70 @@ window.onCreditModule = {
     getPersonTypeBadge,
     toggleCreditSections
 };
+
+/**
+ * Tek veresiye ödeme durumunu değiştir
+ * @param {string} creditId - Veresiye ID'si
+ * @param {boolean} isPaid - Ödeme durumu
+ */
+window.toggleOnCreditStatus = async function(creditId, isPaid) {
+    try {
+        await apiService.fetchPut(`OnCredits/${creditId}/toggle-status`, { isPaid });
+        
+        showSuccessToast('Ödeme durumu başarıyla güncellendi!');
+        await loadOnCredits(); // Tabloyu yeniden yükle
+    } catch (error) {
+        console.error('Ödeme durumu güncellenirken hata:', error);
+        showErrorToast('Ödeme durumu güncellenirken hata oluştu!');
+    }
+};
+
+/**
+ * Tek veresiye sil
+ * @param {string} creditId - Veresiye ID'si
+ * @param {string} personName - Kişi adı
+ */
+window.deleteOnCredit = async function(creditId, personName) {
+    if (confirm(`${personName} adlı kişinin veresiye kaydını silmek istediğinizden emin misiniz?`)) {
+        try {
+            await apiService.fetchDelete(`OnCredits/${creditId}`);
+            
+            showSuccessToast('Veresiye kaydı başarıyla silindi!');
+            await loadOnCredits(); // Tabloyu yeniden yükle
+        } catch (error) {
+            console.error('Veresiye silinirken hata:', error);
+            showErrorToast('Veresiye silinirken hata oluştu!');
+        }
+    }
+};
+
+/**
+ * Modal içeriğini yenile
+ */
+async function refreshModalContent() {
+    // Basit yöntem: Sayfayı yenile yerine toast mesajı göster
+    // Gerçek uygulamada modal'ı dinamik olarak yenilemek daha iyi olur
+    console.log('Modal içeriği güncellenecek...');
+}
+
+/**
+ * Başarı toast mesajı göster
+ * @param {string} message - Gösterilecek mesaj
+ */
+function showSuccessToast(message) {
+    showToast('success', 'Başarılı!', message);
+}
+
+/**
+ * Hata toast mesajı göster
+ * @param {string} message - Gösterilecek mesaj
+ */
+function showErrorToast(message) {
+    showToast('error', 'Hata!', message);
+}
+
+// Debug: Fonksiyonların tanımlı olup olmadığını kontrol et
+console.log('OnCredit JS yüklendi!');
+console.log('toggleSingleCreditFromModal tanımlı mı?', typeof window.toggleSingleCreditFromModal);
+console.log('deleteSingleCreditFromModal tanımlı mı?', typeof window.deleteSingleCreditFromModal);
+console.log('showGroupDetails tanımlı mı?', typeof window.showGroupDetails);

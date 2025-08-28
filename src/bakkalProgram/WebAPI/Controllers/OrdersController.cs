@@ -1,6 +1,7 @@
 using Application.Features.Orders.Commands.Create;
 using Application.Features.Orders.Commands.Delete;
 using Application.Features.Orders.Commands.Update;
+using Application.Features.Orders.Commands.ToggleStatus;
 using Application.Features.Orders.Queries.GetById;
 using Application.Features.Orders.Queries.GetList;
 using NArchitecture.Core.Application.Requests;
@@ -27,6 +28,15 @@ public class OrdersController : BaseController
     public async Task<ActionResult<UpdatedOrderResponse>> Update([FromBody] UpdateOrderCommand command)
     {
         UpdatedOrderResponse response = await Mediator.Send(command);
+
+        return Ok(response);
+    }
+
+    [HttpPut("{id}/toggle-status")]
+    public async Task<ActionResult<ToggleOrderStatusResponse>> ToggleStatus([FromRoute] Guid id, [FromBody] ToggleOrderStatusCommand command)
+    {
+        command.Id = id;
+        ToggleOrderStatusResponse response = await Mediator.Send(command);
 
         return Ok(response);
     }

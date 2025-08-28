@@ -1,6 +1,7 @@
 using Application.Features.OnCredits.Commands.Create;
 using Application.Features.OnCredits.Commands.Delete;
 using Application.Features.OnCredits.Commands.Update;
+using Application.Features.OnCredits.Commands.ToggleStatus;
 using Application.Features.OnCredits.Queries.GetById;
 using Application.Features.OnCredits.Queries.GetList;
 using AutoMapper;
@@ -22,6 +23,8 @@ public class MappingProfiles : Profile
 
         CreateMap<DeleteOnCreditCommand, OnCredit>();
         CreateMap<OnCredit, DeletedOnCreditResponse>();
+
+        CreateMap<OnCredit, ToggleOnCreditStatusResponse>();
 
         CreateMap<OnCredit, GetByIdOnCreditResponse>();
 

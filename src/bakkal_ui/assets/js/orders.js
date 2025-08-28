@@ -32,6 +32,46 @@ const avatarImages = [
 ];
 
 /**
+ * HTML karakterlerini güvenli hale getir (XSS koruması)
+ * @param {string} text - Temizlenecek metin
+ * @returns {string} - Güvenli metin
+ */
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * Tarihi kullanıcı dostu formatta göster
+ * @param {string} dateString - ISO tarih string'i
+ * @returns {string} - Formatlanmış tarih
+ */
+function formatDate(dateString) {
+    if (!dateString) return '';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('tr-TR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+    } catch (error) {
+        console.warn('Tarih format hatası:', error);
+        return dateString;
+    }
+}
+
+/**
+ * Rastgele avatar resmi seç
+ * @returns {string} - Avatar resim yolu
+ */
+function getRandomAvatar() {
+    return avatarImages[Math.floor(Math.random() * avatarImages.length)];
+}
+
+/**
  * DataTable'ı başlat
  */
 function initializeDataTable() {
@@ -215,18 +255,153 @@ function getRandomAvatar() {
 }
 
 /**
- * String'i güvenli HTML'e çevirir (XSS koruması)
+ * Aynı müşteriden birden fazla sipariş varsa bunları gruplar
+ * @param {Array} orders - Sipariş listesi
+ * @returns {Array} - Gruplandırılmış sipariş listesi
  */
-function escapeHtml(text) {
-    if (!text) return '';
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
+function groupOrdersByCustomer(orders) {
+    const groupedOrders = {};
+    
+    orders.forEach(order => {
+        const customerKey = `${order.customerName}_${order.customerSurname || ''}`.toLowerCase();
+        
+        if (!groupedOrders[customerKey]) {
+            groupedOrders[customerKey] = {
+                id: order.id, // İlk siparişin ID'sini kullan
+                customerName: order.customerName,
+                customerSurname: order.customerSurname,
+                orders: [],
+                totalQuantity: 0,
+                allPaid: true,
+                allDelivered: true,
+                earliestDeliveryDate: order.deliveryDate,
+                latestDeliveryDate: order.deliveryDate
+            };
+        }
+        
+        const group = groupedOrders[customerKey];
+        group.orders.push(order);
+        group.totalQuantity += order.quantity;
+        
+        // Ödeme durumu kontrolü - hepsi ödenmişse true
+        if (!order.isPaid) {
+            group.allPaid = false;
+        }
+        
+        // Teslimat durumu kontrolü - hepsi teslim edilmişse true
+        if (!order.isDelivered) {
+            group.allDelivered = false;
+        }
+        
+        // En erken ve en geç teslimat tarihlerini bul
+        if (new Date(order.deliveryDate) < new Date(group.earliestDeliveryDate)) {
+            group.earliestDeliveryDate = order.deliveryDate;
+        }
+        if (new Date(order.deliveryDate) > new Date(group.latestDeliveryDate)) {
+            group.latestDeliveryDate = order.deliveryDate;
+        }
+    });
+    
+    return Object.values(groupedOrders);
+}
+
+/**
+ * Gruplandırılmış siparişler için ürün listesi oluştur
+ * @param {Array} orders - Aynı müşteriye ait siparişler
+ * @returns {string} - HTML formatında ürün listesi
+ */
+function createProductList(orders) {
+    const productMap = {};
+    
+    // Aynı üründen birden fazla varsa miktarları topla
+    orders.forEach(order => {
+        if (productMap[order.productName]) {
+            productMap[order.productName] += order.quantity;
+        } else {
+            productMap[order.productName] = order.quantity;
+        }
+    });
+    
+    const productList = Object.entries(productMap)
+        .map(([productName, quantity]) => `${escapeHtml(productName)} (${quantity} adet)`)
+        .join('<br>');
+    
+    return `<div class="product-list">${productList}</div>`;
+}
+
+/**
+ * Gruplandırılmış siparişler için tarih aralığı göster
+ * @param {string} earliestDate - En erken tarih
+ * @param {string} latestDate - En geç tarih
+ * @returns {string} - Formatlanmış tarih aralığı
+ */
+function formatDateRange(earliestDate, latestDate) {
+    const earliest = formatDate(earliestDate);
+    const latest = formatDate(latestDate);
+    
+    if (earliest === latest) {
+        return earliest;
+    } else {
+        return `${earliest} - ${latest}`;
+    }
+}
+
+/**
+ * Gruplandırılmış siparişler için karma durum badge'i
+ * @param {boolean} allPaid - Tüm siparişler ödenmiş mi?
+ * @param {boolean} allDelivered - Tüm siparişler teslim edilmiş mi?
+ * @param {number} orderCount - Toplam sipariş sayısı
+ * @param {Array} orders - Sipariş listesi (detaylı durum kontrolü için)
+ * @returns {Object} - HTML badge'ler
+ */
+function getMixedStatusBadge(allPaid, allDelivered, orderCount, orders = []) {
+    if (orderCount === 1) {
+        // Tek sipariş varsa normal badge'leri kullan
+        return {
+            payment: getPaymentStatusBadge(allPaid),
+            delivery: getStatusBadge(allDelivered)
+        };
+    }
+    
+    // Birden fazla sipariş için detaylı durum analizi
+    let deliveredCount = 0;
+    let paidCount = 0;
+    
+    if (orders.length > 0) {
+        deliveredCount = orders.filter(order => order.isDelivered).length;
+        paidCount = orders.filter(order => order.isPaid).length;
+    }
+    
+    // Teslimat durumu badge'i
+    let deliveryBadge;
+    if (deliveredCount === 0) {
+        // Hiçbiri teslim edilmemiş
+        deliveryBadge = '<span class="badge bg-warning-subtle text-warning">Tümü Bekliyor</span>';
+    } else if (deliveredCount === orderCount) {
+        // Hepsi teslim edilmiş
+        deliveryBadge = '<span class="badge bg-success-subtle text-success">Tümü Teslim Edildi</span>';
+    } else {
+        // Kısmi teslim
+        deliveryBadge = `<span class="badge bg-warning-subtle text-warning">Kısmi Teslim (${deliveredCount}/${orderCount})</span>`;
+    }
+    
+    // Ödeme durumu badge'i
+    let paymentBadge;
+    if (paidCount === 0) {
+        // Hiçbiri ödenmemiş
+        paymentBadge = '<span class="badge bg-danger-subtle text-danger">Hiçbiri Ödenmedi</span>';
+    } else if (paidCount === orderCount) {
+        // Hepsi ödenmiş
+        paymentBadge = '<span class="badge bg-success-subtle text-success">Tümü Ödendi</span>';
+    } else {
+        // Kısmi ödeme
+        paymentBadge = `<span class="badge bg-warning-subtle text-warning">Kısmi Ödeme (${paidCount}/${orderCount})</span>`;
+    }
+    
+    return {
+        payment: paymentBadge,
+        delivery: deliveryBadge
     };
-    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
 /**
@@ -375,9 +550,13 @@ async function loadOrders() {
         ordersDataTable.clear();
 
         if (orders && orders.length > 0) {
-            // Her sipariş için satır verisi oluştur ve tabloya ekle
-            orders.forEach(order => {
-                const rowData = createOrderRowData(order);
+            // Siparişleri müşterilere göre gruplandır
+            const groupedOrders = groupOrdersByCustomer(orders);
+            console.log('Gruplandırılmış siparişler:', groupedOrders);
+            
+            // Her gruplandırılmış sipariş için satır verisi oluştur ve tabloya ekle
+            groupedOrders.forEach(orderGroup => {
+                const rowData = createOrderRowData(orderGroup);
                 ordersDataTable.row.add(rowData);
             });
         } else {
@@ -394,11 +573,27 @@ async function loadOrders() {
         console.error('Hata detayları:', {
             message: error.message,
             stack: error.stack,
-            url: `${window.apiService ? 'API Servisi mevcut' : 'API Servisi mevcut değil'}`
+            name: error.name,
+            apiServiceExists: !!window.apiService,
+            groupOrdersByCustomerExists: typeof groupOrdersByCustomer === 'function',
+            ordersDataTableExists: !!ordersDataTable
         });
+        
+        // Hata türüne göre farklı mesajlar
+        let errorMessage = 'Bilinmeyen bir hata oluştu.';
+        if (error.message) {
+            errorMessage = error.message;
+        }
+        if (error.name === 'TypeError' && error.message.includes('groupOrdersByCustomer')) {
+            errorMessage = 'Sipariş gruplama fonksiyonu bulunamadı.';
+        }
+        if (error.name === 'ReferenceError') {
+            errorMessage = 'Gerekli fonksiyon veya değişken tanımlanmamış.';
+        }
+        
         showErrorState();
         // Kullanıcı dostu hata mesajı göster
-        showToast('error', 'Hata!', `Siparişler yüklenirken bir hata oluştu: ${error.message}`);
+        showToast('error', 'Hata!', `Siparişler yüklenirken bir hata oluştu: ${errorMessage}`);
     }
 }
 
@@ -436,54 +631,134 @@ function showErrorState() {
 }
 
 /**
- * DataTable için sipariş satır verisi oluştur
- * @param {Object} order - API'den gelen sipariş verisi
+ * DataTable için sipariş satır verisi oluştur (hem tek hem de gruplandırılmış siparişler için)
+ * @param {Object} orderOrGroup - API'den gelen sipariş verisi veya gruplandırılmış sipariş verisi
  * @returns {Array} - DataTable satır verisi
  */
-function createOrderRowData(order) {
+function createOrderRowData(orderOrGroup) {
     // Debug: Sipariş verisini logla
-    console.log('Sipariş verisi:', order);
+    console.log('Sipariş verisi:', orderOrGroup);
     
     const avatarImg = getRandomAvatar();
-    const fullCustomerName = order.customerSurname ? 
-        `${order.customerName} ${order.customerSurname}` : 
-        order.customerName;
+    
+    // Gruplandırılmış sipariş mi yoksa tek sipariş mi kontrol et
+    if (orderOrGroup.orders && Array.isArray(orderOrGroup.orders)) {
+        // Gruplandırılmış sipariş
+        const orderGroup = orderOrGroup;
+        const fullCustomerName = orderGroup.customerSurname ? 
+            `${orderGroup.customerName} ${orderGroup.customerSurname}` : 
+            orderGroup.customerName;
+        
+        const orderCount = orderGroup.orders.length;
+        const statusBadges = getMixedStatusBadge(orderGroup.allPaid, orderGroup.allDelivered, orderCount, orderGroup.orders);
+        
+        return [
+            // Müşteri Adı Soyadı
+            `<div class="d-flex align-items-center">
+                <img src="${avatarImg}" class="rounded-circle" width="40" height="40" alt="Customer Avatar">
+                <div class="ms-3">
+                    <h6 class="fs-4 fw-semibold mb-0">${escapeHtml(fullCustomerName)}</h6>
+                    <span class="fw-normal text-muted">Müşteri ${orderCount > 1 ? `(${orderCount} sipariş)` : ''}</span>
+                </div>
+            </div>`,
+            
+            // Ürünler (gruplandırılmış)
+            createProductList(orderGroup.orders),
+            
+            // Toplam Miktar
+            `<span class="badge bg-info-subtle text-info">${orderGroup.totalQuantity} adet</span>`,
+            
+            // Teslimat Tarihi Aralığı
+            `<p class="mb-0 fw-normal">${formatDateRange(orderGroup.earliestDeliveryDate, orderGroup.latestDeliveryDate)}</p>`,
+            
+            // Durum
+            statusBadges.delivery,
+            
+            // Ödeme Durumu
+            statusBadges.payment,
+            
+            // İşlemler
+            createGroupActionButtons(orderGroup)
+        ];
+    } else {
+        // Tek sipariş
+        const order = orderOrGroup;
+        const fullCustomerName = order.customerSurname ? 
+            `${order.customerName} ${order.customerSurname}` : 
+            order.customerName;
 
-    return [
-        // Müşteri Adı Soyadı
-        `<div class="d-flex align-items-center">
-            <img src="${avatarImg}" class="rounded-circle" width="40" height="40" alt="Customer Avatar">
-            <div class="ms-3">
-                <h6 class="fs-4 fw-semibold mb-0">${escapeHtml(fullCustomerName)}</h6>
-                <span class="fw-normal text-muted">Müşteri</span>
-            </div>
-        </div>`,
-        
-        // Ürün
-        `<p class="mb-0 fw-normal">${escapeHtml(order.productName)}</p>`,
-        
-        // Miktar
-        `<span class="badge bg-info-subtle text-info">${order.quantity} adet</span>`,
-        
-        // Teslimat Tarihi
-        `<p class="mb-0 fw-normal">${formatDate(order.deliveryDate)}</p>`,
-        
-        // Durum
-        `${getStatusBadge(order.isDelivered)}`,
-        
-        // Ödeme Durumu
-        `${getPaymentStatusBadge(order.isPaid)}`,
-        
-        // İşlemler
-        `<div class="d-flex justify-content-center gap-1">
+        return [
+            // Müşteri Adı Soyadı
+            `<div class="d-flex align-items-center">
+                <img src="${avatarImg}" class="rounded-circle" width="40" height="40" alt="Customer Avatar">
+                <div class="ms-3">
+                    <h6 class="fs-4 fw-semibold mb-0">${escapeHtml(fullCustomerName)}</h6>
+                    <span class="fw-normal text-muted">Müşteri</span>
+                </div>
+            </div>`,
+            
+            // Ürün
+            `<p class="mb-0 fw-normal">${escapeHtml(order.productName)}</p>`,
+            
+            // Miktar
+            `<span class="badge bg-info-subtle text-info">${order.quantity} adet</span>`,
+            
+            // Teslimat Tarihi
+            `<p class="mb-0 fw-normal">${formatDate(order.deliveryDate)}</p>`,
+            
+            // Durum
+            `${getStatusBadge(order.isDelivered)}`,
+            
+            // Ödeme Durumu
+            `${getPaymentStatusBadge(order.isPaid)}`,
+            
+            // İşlemler
+            `<div class="d-flex justify-content-center gap-1">
+                <button class="btn btn-outline-success btn-sm" onclick="toggleOrderStatus('${order.id}', ${!order.isDelivered})" title="${order.isDelivered ? 'Bekliyor Yap' : 'Teslim Et'}">
+                    <i class="fas fa-${order.isDelivered ? 'undo' : 'check'}"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="deleteOrder('${order.id}', '${escapeHtml(fullCustomerName)}')" title="Sil">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>`
+        ];
+    }
+}
+
+/**
+ * Gruplandırılmış siparişler için aksiyon butonları oluştur
+ * @param {Object} orderGroup - Gruplandırılmış sipariş verisi
+ * @returns {string} - HTML buton grubu
+ */
+function createGroupActionButtons(orderGroup) {
+    const orderCount = orderGroup.orders.length;
+    
+    if (orderCount === 1) {
+        // Tek sipariş varsa normal butonları göster
+        const order = orderGroup.orders[0];
+        return `<div class="d-flex justify-content-center gap-1">
             <button class="btn btn-outline-success btn-sm" onclick="toggleOrderStatus('${order.id}', ${!order.isDelivered})" title="${order.isDelivered ? 'Bekliyor Yap' : 'Teslim Et'}">
                 <i class="fas fa-${order.isDelivered ? 'undo' : 'check'}"></i>
             </button>
-            <button class="btn btn-outline-danger btn-sm" onclick="deleteOrder('${order.id}', '${escapeHtml(fullCustomerName)}')" title="Sil">
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteOrder('${order.id}', '${escapeHtml(orderGroup.customerName)}')" title="Sil">
                 <i class="fas fa-trash"></i>
             </button>
-        </div>`
-    ];
+        </div>`;
+    } else {
+        // Birden fazla sipariş varsa grup işlem butonları göster
+        const orderIds = orderGroup.orders.map(o => o.id).join(',');
+        return `<div class="d-flex justify-content-center gap-1">
+            <button class="btn btn-outline-info btn-sm" onclick="showGroupDetails('${orderIds}')" title="Detayları Göster">
+                <i class="fas fa-eye"></i>
+            </button>
+            <button class="btn btn-outline-success btn-sm" onclick="toggleGroupStatus('${orderIds}', true)" title="Tümünü Teslim Et">
+                <i class="fas fa-check-double"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteOrderGroup('${orderIds}', '${escapeHtml(orderGroup.customerName)}')" title="Tümünü Sil">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>`;
+    }
 }
 
 /**
@@ -857,6 +1132,33 @@ function showToast(type, title, message) {
 }
 
 /**
+ * Onay dialog'u göster
+ * @param {string} title - Dialog başlığı
+ * @param {string} message - Dialog mesajı
+ * @param {string} warning - Uyarı mesajı (opsiyonel)
+ * @returns {Promise<boolean>} - Kullanıcı seçimi
+ */
+async function showConfirmDialog(title, message, warning = '') {
+    // SweetAlert2 varsa onu kullan
+    if (typeof Swal !== 'undefined') {
+        const result = await Swal.fire({
+            title: title,
+            html: `${message}${warning ? `<br><small class="text-muted">${warning}</small>` : ''}`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Evet, Sil',
+            cancelButtonText: 'İptal'
+        });
+        return result.isConfirmed;
+    } else {
+        // Fallback olarak standart confirm kullan
+        return confirm(`${title}\n\n${message}${warning ? `\n${warning}` : ''}`);
+    }
+}
+
+/**
  * Sayfa yüklendiğinde çalışacak initialization fonksiyonu
  */
 function initializeOrdersPage() {
@@ -885,13 +1187,22 @@ function initializeOrdersPage() {
         });
     }
     
-    // Promise.all ile üç asenkron işlemi aynı anda başlat
-    Promise.all([
+    // Dashboard sayfası kontrolü - eğer dashboard'da isek otomatik yükleme yapma
+    const isDashboard = window.location.pathname.includes('dashboard.html');
+    
+    // Promise.all ile asenkron işlemleri başlat
+    const loadPromises = [
         loadProductsForDropdown(),
-        loadCustomersForDropdown(),
-        loadOrders()
-    ]).then(() => {
-        console.log('Tüm veriler başarıyla yüklendi.');
+        loadCustomersForDropdown()
+    ];
+    
+    // Sadece dashboard'da değilsek orders'ı da yükle
+    if (!isDashboard) {
+        loadPromises.push(loadOrders());
+    }
+    
+    Promise.all(loadPromises).then(() => {
+        console.log(isDashboard ? 'Dashboard verileri başarıyla yüklendi.' : 'Tüm veriler başarıyla yüklendi.');
     }).catch(error => {
         console.error('Veriler yüklenirken hata:', error);
         showToast('error', 'Hata!', 'Sayfa verileri yüklenirken bir hata oluştu.');
@@ -981,5 +1292,222 @@ window.printTable = function() {
         ordersDataTable.button('print').trigger();
     } else {
         showToast('error', 'Hata!', 'Yazdırma özelliği yüklenemedi.');
+    }
+};
+
+/**
+ * Grup detaylarını modal ile göster
+ * @param {string} orderIds - Virgülle ayrılmış sipariş ID'leri
+ */
+window.showGroupDetails = function(orderIds) {
+    const ids = orderIds.split(',');
+    
+    // Modal oluştur
+    const modalHtml = `
+        <div class="modal fade" id="groupDetailsModal" tabindex="-1" aria-labelledby="groupDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="groupDetailsModalLabel">
+                            <i class="fas fa-list-ul me-2"></i>Sipariş Grubu Detayları (${ids.length} sipariş)
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="groupDetailsContent">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                                <p class="mt-2">Sipariş detayları yükleniyor...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                        <button type="button" class="btn btn-success" onclick="toggleGroupStatus('${orderIds}', true)">
+                            <i class="fas fa-check-double me-1"></i>Tümünü Teslim Et
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Eski modal varsa kaldır
+    const existingModal = document.getElementById('groupDetailsModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Yeni modal ekle
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Modal'ı göster
+    const modal = new bootstrap.Modal(document.getElementById('groupDetailsModal'));
+    modal.show();
+    
+    // Sipariş detaylarını yükle
+    loadGroupDetails(ids);
+};
+
+/**
+ * Grup sipariş detaylarını yükle
+ * @param {Array} orderIds - Sipariş ID'leri array'i
+ */
+async function loadGroupDetails(orderIds) {
+    try {
+        const contentDiv = document.getElementById('groupDetailsContent');
+        let detailsHtml = '<div class="row">';
+        
+        for (let i = 0; i < orderIds.length; i++) {
+            const orderId = orderIds[i];
+            
+            // Her sipariş için ayrı API çağrısı (gerekirse tek çağrıda alabilirsin)
+            try {
+                const order = await apiService.fetchGetById('Orders', orderId);
+                
+                detailsHtml += `
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary-subtle">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-shopping-cart me-2"></i>Sipariş ${i + 1}
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <strong>Ürün:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        ${escapeHtml(order.productName)}
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Miktar:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="badge bg-info">${order.quantity} adet</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Teslimat:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        ${formatDate(order.deliveryDate)}
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Durum:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        ${getStatusBadge(order.isDelivered)}
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Ödeme:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        ${getPaymentStatusBadge(order.isPaid)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error(`Sipariş ${orderId} detayı yüklenemedi:`, error);
+                detailsHtml += `
+                    <div class="col-md-6 mb-3">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Sipariş #${orderId} detayı yüklenemedi.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        detailsHtml += '</div>';
+        contentDiv.innerHTML = detailsHtml;
+        
+    } catch (error) {
+        console.error('Grup detayları yüklenirken hata:', error);
+        document.getElementById('groupDetailsContent').innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Detaylar yüklenirken bir hata oluştu.
+            </div>
+        `;
+    }
+}
+
+/**
+ * Grup siparişlerinin durumunu toplu değiştir
+ * @param {string} orderIds - Virgülle ayrılmış sipariş ID'leri
+ * @param {boolean} newStatus - Yeni durum
+ */
+window.toggleGroupStatus = async function(orderIds, newStatus) {
+    const ids = orderIds.split(',');
+    
+    try {
+        showToast('info', 'İşleniyor...', `${ids.length} siparişin durumu güncelleniyor...`);
+        
+        // Her sipariş için durum güncelle
+        const updatePromises = ids.map(orderId => 
+            apiService.fetchPut(`Orders/${orderId}/toggle-status`, { isDelivered: newStatus })
+        );
+        
+        await Promise.all(updatePromises);
+        
+        // Tabloyu yenile
+        await loadOrders();
+        
+        // Modal'ı kapat (varsa)
+        const modal = document.getElementById('groupDetailsModal');
+        if (modal) {
+            bootstrap.Modal.getInstance(modal)?.hide();
+        }
+        
+        showToast('success', 'Başarılı!', `${ids.length} siparişin durumu güncellendi.`);
+        
+    } catch (error) {
+        console.error('Grup durum güncelleme hatası:', error);
+        showToast('error', 'Hata!', 'Sipariş durumları güncellenirken hata oluştu.');
+    }
+};
+
+/**
+ * Grup siparişlerini toplu sil
+ * @param {string} orderIds - Virgülle ayrılmış sipariş ID'leri  
+ * @param {string} customerName - Müşteri adı
+ */
+window.deleteOrderGroup = async function(orderIds, customerName) {
+    const ids = orderIds.split(',');
+    
+    // Onay al
+    const confirmed = await showConfirmDialog(
+        'Grup Siparişleri Sil',
+        `${customerName} müşterisinin ${ids.length} siparişini silmek istediğinizden emin misiniz?`,
+        'Bu işlem geri alınamaz!'
+    );
+    
+    if (!confirmed) return;
+    
+    try {
+        showToast('info', 'İşleniyor...', `${ids.length} sipariş siliniyor...`);
+        
+        // Her sipariş için silme işlemi
+        const deletePromises = ids.map(orderId => 
+            apiService.fetchDelete(`Orders/${orderId}`)
+        );
+        
+        await Promise.all(deletePromises);
+        
+        // Tabloyu yenile
+        await loadOrders();
+        
+        showToast('success', 'Başarılı!', `${ids.length} sipariş başarıyla silindi.`);
+        
+    } catch (error) {
+        console.error('Grup silme hatası:', error);
+        showToast('error', 'Hata!', 'Siparişler silinirken hata oluştu.');
     }
 };

@@ -1,6 +1,7 @@
 using Application.Features.OnCredits.Commands.Create;
 using Application.Features.OnCredits.Commands.Delete;
 using Application.Features.OnCredits.Commands.Update;
+using Application.Features.OnCredits.Commands.ToggleStatus;
 using Application.Features.OnCredits.Queries.GetById;
 using Application.Features.OnCredits.Queries.GetList;
 using NArchitecture.Core.Application.Requests;
@@ -25,6 +26,15 @@ public class OnCreditsController : BaseController
     public async Task<ActionResult<UpdatedOnCreditResponse>> Update([FromBody] UpdateOnCreditCommand command)
     {
         UpdatedOnCreditResponse response = await Mediator.Send(command);
+
+        return Ok(response);
+    }
+
+    [HttpPut("{id}/toggle-status")]
+    public async Task<ActionResult<ToggleOnCreditStatusResponse>> ToggleStatus([FromRoute] Guid id, [FromBody] ToggleOnCreditStatusCommand command)
+    {
+        command.Id = id;
+        ToggleOnCreditStatusResponse response = await Mediator.Send(command);
 
         return Ok(response);
     }
