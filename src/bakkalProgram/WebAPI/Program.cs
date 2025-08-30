@@ -15,7 +15,10 @@ using WebAPI;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
 builder.Services.AddControllers();
+
+// Configure Application Services (includes MediatR)
 builder.Services.AddApplicationServices(
     mailSettings: builder.Configuration.GetSection("MailSettings").Get<MailSettings>()
         ?? throw new InvalidOperationException("MailSettings section cannot found in configuration."),
@@ -28,19 +31,29 @@ builder.Services.AddApplicationServices(
     tokenOptions: builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>()
         ?? throw new InvalidOperationException("TokenOptions section cannot found in configuration.")
 );
+
+// Configure Persistence Services
 builder.Services.AddPersistenceServices(builder.Configuration);
+
+// Configure Infrastructure Services  
 builder.Services.AddInfrastructureServices();
+
+// Add required services
 builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddDistributedMemoryCache();
-
 builder.Services.AddEndpointsApiExplorer();
+
+// Configure CORS
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(p =>
     {
-        p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        p.WithOrigins("http://ilgazmountainbakkal.com.tr", "null")
+            .AllowAnyHeader()
+            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
     })
 );
+
+// Configure Swagger
 builder.Services.AddSwaggerGen(opt =>
 {
 });
@@ -57,8 +70,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-if (app.Environment.IsProduction())
-    app.ConfigureCustomExceptionMiddleware();
+// Always configure exception middleware for better error handling
+app.ConfigureCustomExceptionMiddleware();
 
 app.UseDbMigrationApplier();
 

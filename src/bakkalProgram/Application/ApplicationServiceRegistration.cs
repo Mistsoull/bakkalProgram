@@ -35,10 +35,13 @@ public static class ApplicationServiceRegistration
         TokenOptions tokenOptions
     )
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        var assembly = Assembly.GetExecutingAssembly();
+        
+        services.AddAutoMapper(assembly);
+        
         services.AddMediatR(configuration =>
         {
-            configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            configuration.RegisterServicesFromAssembly(assembly);
             configuration.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
             configuration.AddOpenBehavior(typeof(CachingBehavior<,>));
             configuration.AddOpenBehavior(typeof(CacheRemovingBehavior<,>));
@@ -47,9 +50,9 @@ public static class ApplicationServiceRegistration
             configuration.AddOpenBehavior(typeof(TransactionScopeBehavior<,>));
         });
 
-        services.AddSubClassesOfType(Assembly.GetExecutingAssembly(), typeof(BaseBusinessRules));
+        services.AddSubClassesOfType(assembly, typeof(BaseBusinessRules));
 
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddValidatorsFromAssembly(assembly);
 
         services.AddSingleton<IMailService, MailKitMailService>(_ => new MailKitMailService(mailSettings));
         services.AddSingleton<ILogger, SerilogFileLogger>(_ => new SerilogFileLogger(fileLogConfiguration));
@@ -75,12 +78,12 @@ public static class ApplicationServiceRegistration
         Func<IServiceCollection, Type, IServiceCollection>? addWithLifeCycle = null
     )
     {
-        var types = assembly.GetTypes().Where(t => t.IsSubclassOf(type) && type != t).ToList();
+        var types = assembly.GetTypes().Where(t => t.IsSubclassOf(type) && type != t && !t.IsAbstract).ToList();
         foreach (Type? item in types)
             if (addWithLifeCycle == null)
                 services.AddScoped(item);
             else
-                addWithLifeCycle(services, type);
+                addWithLifeCycle(services, item);
         return services;
     }
 }
