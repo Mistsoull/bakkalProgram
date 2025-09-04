@@ -8,14 +8,12 @@ namespace Application.Features.Orders.Commands.Create;
 
 public class CreateOrderCommand : IRequest<CreatedOrderResponse>
 {
-    public required string ProductName { get; set; }
-    public required int Quantity { get; set; }
     public required string CustomerName { get; set; }
     public string? CustomerSurname { get; set; }
     public required DateTime DeliveryDate { get; set; }
     public required bool isPaid { get; set; }
-    public Guid? ProductId { get; set; }
     public Guid? CustomerId { get; set; }
+    public required List<CreateOrderItemDto> Items { get; set; } = new();
 
     public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, CreatedOrderResponse>
     {
@@ -33,14 +31,55 @@ public class CreateOrderCommand : IRequest<CreatedOrderResponse>
 
         public async Task<CreatedOrderResponse> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            Order order = _mapper.Map<Order>(request);
-            await _orderBusinessRules.SetProductNameBasedOnProductId(request.ProductId, request.ProductName, order);
-            await _orderBusinessRules.SetCustomerNameBasedOnCustomerId(request.CustomerId, request.CustomerName, order);
-            
+            // Yeni Order oluştur
+            Order order = new Order
+            {
+                CustomerName = request.CustomerName,
+                CustomerSurname = request.CustomerSurname,
+                DeliveryDate = request.DeliveryDate,
+                isPaid = request.isPaid,
+                CustomerId = request.CustomerId
+            };
+
+            // Set customer name if CustomerId is provided
+            if (request.CustomerId.HasValue)
+            {
+                await _orderBusinessRules.SetCustomerNameBasedOnCustomerId(request.CustomerId, request.CustomerName, order);
+            }
+
+            // Items'ları ekle
+            foreach (var itemDto in request.Items)
+            {
+                string productName = itemDto.ProductName;
+                
+                // Set product name if ProductId is provided
+                if (itemDto.ProductId.HasValue)
+                {
+                    var tempOrderItem = new OrderItem { ProductName = itemDto.ProductName };
+                    await _orderBusinessRules.SetProductNameForOrderItem(itemDto.ProductId, itemDto.ProductName, tempOrderItem);
+                    productName = tempOrderItem.ProductName;
+                }
+
+                order.AddItem(
+                    productName,
+                    itemDto.Quantity,
+                    itemDto.UnitPrice ?? 0, // Eğer birim fiyat yoksa 0 kullan
+                    itemDto.ProductId
+                );
+            }
+
             await _orderRepository.AddAsync(order);
 
             CreatedOrderResponse response = _mapper.Map<CreatedOrderResponse>(order);
             return response;
         }
     }
+}
+
+public class CreateOrderItemDto
+{
+    public Guid? ProductId { get; set; }
+    public required string ProductName { get; set; }
+    public required int Quantity { get; set; }
+    public decimal? UnitPrice { get; set; }
 }

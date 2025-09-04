@@ -68,4 +68,17 @@ public class OrderBusinessRules : BaseBusinessRules
         Customer? customer = await _customerRepository.GetAsync(predicate: c => c.Id == customerId);
         order.CustomerName = customer?.Name ?? customerName;
     }
+
+    // OrderItem için ürün adını set et
+    public async Task SetProductNameForOrderItem(Guid? productId, string productName, OrderItem orderItem)
+    {
+        if (productId == null || productId == Guid.Empty)
+        {
+            orderItem.ProductName = productName;
+            return;
+        }
+
+        Product? product = await _productRepository.GetAsync(predicate: p => p.Id == productId);
+        orderItem.ProductName = product?.Name ?? productName;
+    }
 }

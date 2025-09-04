@@ -505,16 +505,7 @@
                       <thead class="text-dark fs-4">
                         <tr>
                           <th>
-                            <h6 class="fs-4 fw-semibold mb-0">Müşteri Adı Soyadı</h6>
-                          </th>
-                          <th>
-                            <h6 class="fs-4 fw-semibold mb-0">Ürün</h6>
-                          </th>
-                          <th>
-                            <h6 class="fs-4 fw-semibold mb-0">Miktar</h6>
-                          </th>
-                          <th>
-                            <h6 class="fs-4 fw-semibold mb-0">Toplam Tutar</h6>
+                            <h6 class="fs-4 fw-semibold mb-0">Müşteri</h6>
                           </th>
                           <th>
                             <h6 class="fs-4 fw-semibold mb-0">Teslimat Tarihi</h6>
@@ -563,7 +554,7 @@
           <!-- Add Order Modal -->
           <div class="modal fade" id="addOrderModal" tabindex="-1" aria-labelledby="addOrderModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl">
               <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title" id="addOrderModalLabel">
@@ -573,65 +564,44 @@
                 </div>
                 <form id="add-order-form">
                   <div class="modal-body">
-                    <div class="row">
-                      <!-- Ürün Seçimi -->
-                      <div class="col-md-6 mb-3">
-                        <label for="order-product-select" class="form-label">Ürün Seç (Opsiyonel)</label>
-                        <select class="form-select" id="order-product-select">
-                          <option value="">Ürün Seç (Opsiyonel)</option>
-                        </select>
+                    <!-- Müşteri Bilgileri -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h6 class="border-bottom pb-2 mb-3">
+                          <i class="fas fa-user me-2"></i>Müşteri Bilgileri
+                        </h6>
                       </div>
-
-                      <!-- Ürün Adı Manuel Giriş -->
-                      <div class="col-md-6 mb-3">
-                        <label for="order-product-name-input" class="form-label">Ürün Adı <span
-                            class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="order-product-name-input"
-                          placeholder="Ürün adını giriniz" required>
-                        <div class="form-text">Yukarıdan seçim yaparsanız otomatik doldurulur</div>
-                      </div>
-
-                      <!-- Miktar -->
-                      <div class="col-md-6 mb-3">
-                        <label for="order-quantity-input" class="form-label">Miktar <span
-                            class="text-danger">*</span></label>
-                        <input type="number" class="form-control" id="order-quantity-input" placeholder="Miktar giriniz"
-                          min="1" required>
-                      </div>
-
-                      <!-- Müşteri Seçimi -->
                       <div class="col-md-6 mb-3">
                         <label for="order-customer-select" class="form-label">Müşteri Seç (Opsiyonel)</label>
                         <select class="form-select" id="order-customer-select">
                           <option value="">Müşteri Seç (Opsiyonel)</option>
                         </select>
                       </div>
-
-                      <!-- Müşteri Adı Manuel Giriş -->
-                      <div class="col-md-6 mb-3">
+                      <div class="col-md-3 mb-3">
                         <label for="order-customer-name-input" class="form-label">Müşteri Adı <span
                             class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="order-customer-name-input"
                           placeholder="Müşteri adını giriniz" required>
-                        <div class="form-text">Yukarıdan seçim yaparsanız otomatik doldurulur</div>
                       </div>
-
-                      <!-- Müşteri Soyadı Manuel Giriş -->
-                      <div class="col-md-6 mb-3">
+                      <div class="col-md-3 mb-3">
                         <label for="order-customer-surname-input" class="form-label">Müşteri Soyadı</label>
                         <input type="text" class="form-control" id="order-customer-surname-input"
                           placeholder="Müşteri soyadını giriniz">
-                        <div class="form-text">Yukarıdan seçim yaparsanız otomatik doldurulur</div>
                       </div>
+                    </div>
 
-                      <!-- Teslimat Tarihi -->
+                    <!-- Sipariş Bilgileri -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h6 class="border-bottom pb-2 mb-3">
+                          <i class="fas fa-calendar me-2"></i>Sipariş Bilgileri
+                        </h6>
+                      </div>
                       <div class="col-md-6 mb-3">
                         <label for="order-delivery-date-input" class="form-label">Teslimat Tarihi <span
                             class="text-danger">*</span></label>
                         <input type="date" class="form-control" id="order-delivery-date-input" required>
                       </div>
-
-                      <!-- Ödeme Durumu -->
                       <div class="col-md-6 mb-3">
                         <label for="order-payment-status-select" class="form-label">Ödeme Durumu <span
                             class="text-danger">*</span></label>
@@ -640,6 +610,65 @@
                           <option value="true">Ödendi</option>
                           <option value="false">Ödenmedi</option>
                         </select>
+                      </div>
+                    </div>
+
+                    <!-- Ürün Ekleme Bölümü -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h6 class="border-bottom pb-2 mb-3">
+                          <i class="fas fa-box me-2"></i>Ürün Ekleme
+                        </h6>
+                      </div>
+                      <div class="col-md-4 mb-3">
+                        <label for="item-product-select" class="form-label">Ürün Seç (Opsiyonel)</label>
+                        <select class="form-select" id="item-product-select">
+                          <option value="">Ürün Seç (Opsiyonel)</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4 mb-3">
+                        <label for="item-product-name-input" class="form-label">Ürün Adı <span
+                            class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="item-product-name-input"
+                          placeholder="Ürün adını giriniz">
+                      </div>
+                      <div class="col-md-2 mb-3">
+                        <label for="item-quantity-input" class="form-label">Miktar <span
+                            class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="item-quantity-input" placeholder="Miktar" min="1">
+                      </div>
+                      <div class="col-md-2 mb-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="button" class="btn btn-success d-block w-100" id="add-item-btn">
+                          <i class="fas fa-plus me-1"></i>Ekle
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Eklenen Ürünler Tablosu -->
+                    <div class="row">
+                      <div class="col-12">
+                        <h6 class="border-bottom pb-2 mb-3">
+                          <i class="fas fa-list me-2"></i>Eklenen Ürünler
+                        </h6>
+                        <div class="table-responsive">
+                          <table class="table table-bordered" id="items-table">
+                            <thead class="table-light">
+                              <tr>
+                                <th>Ürün Adı</th>
+                                <th>Miktar</th>
+                                <th class="text-center">İşlem</th>
+                              </tr>
+                            </thead>
+                            <tbody id="items-table-body">
+                              <tr id="no-items-row">
+                                <td colspan="3" class="text-center text-muted">
+                                  <i class="fas fa-box-open me-2"></i>Henüz ürün eklenmedi
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -652,6 +681,41 @@
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Detail Modal -->
+          <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="orderDetailModalLabel">
+                    <i class="fas fa-eye me-2"></i>Sipariş Detayları
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Ürün Adı</th>
+                          <th class="text-center" width="30%">Miktar</th>
+                        </tr>
+                      </thead>
+                      <tbody id="order-detail-items">
+                        <!-- Order items will be loaded here -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Kapat
+                  </button>
+                </div>
               </div>
             </div>
           </div>

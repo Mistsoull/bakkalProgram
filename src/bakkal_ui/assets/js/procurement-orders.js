@@ -618,9 +618,8 @@ function updateItemsTable() {
             row.innerHTML = `
                 <td>
                     <strong>${escapeHtml(item.productName)}</strong>
-                    ${item.productId ? '<small class="text-muted d-block">Sistem Ürünü</small>' : '<small class="text-muted d-block">Manuel Giriş</small>'}
                 </td>
-                <td><span class="badge bg-primary">${item.quantity}</span></td>
+                <td><span class="badge bg-info text-dark">${item.quantity}</span></td>
                 <td>
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-outline-danger" onclick="removeItem(${index})" title="Sil">
@@ -831,25 +830,18 @@ function showOrderDetailsModal(orderDetails) {
     if (orderDetails.items && orderDetails.items.length > 0) {
         itemsHtml = orderDetails.items.map((item, index) => `
             <tr>
-                <td class="text-center">
-                    <span class="badge bg-primary">${index + 1}</span>
-                </td>
                 <td>
-                    <div class="fw-semibold">${escapeHtml(item.productName)}</div>
-                    ${item.productId ? 
-                        '<small class="text-muted"><i class="fas fa-check me-1"></i>Sistem Ürünü</small>' : 
-                        '<small class="text-muted"><i class="fas fa-edit me-1"></i>Manuel Giriş</small>'
-                    }
+                    <div class="fw-semibold text-dark">${escapeHtml(item.productName)}</div>
                 </td>
                 <td class="text-center">
-                    <span class="badge bg-success fs-6 px-3 py-2">${item.quantity}</span>
+                    <span class="badge bg-success text-white fs-6 px-3 py-2">${item.quantity}</span>
                 </td>
             </tr>
         `).join('');
     } else {
         itemsHtml = `
             <tr>
-                <td colspan="3" class="text-center text-muted py-5">
+                <td colspan="2" class="text-center text-muted py-5">
                     <i class="fas fa-box-open fa-3x mb-3"></i>
                     <br>
                     <h5>Henüz ürün eklenmemiş</h5>
@@ -871,12 +863,11 @@ function showOrderDetailsModal(orderDetails) {
         </div>
         
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
                     <tr>
-                        <th class="text-center" style="width: 10%;">#</th>
                         <th style="width: 70%;">Ürün Adı</th>
-                        <th class="text-center" style="width: 20%;">Miktar</th>
+                        <th class="text-center" style="width: 30%;">Miktar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -899,11 +890,11 @@ function createOrderDetailsModal() {
         <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="orderDetailsModalLabel">
+                    <div class="modal-header bg-light">
+                        <h5 class="modal-title text-dark" id="orderDetailsModalLabel">
                             <i class="fas fa-clipboard-list me-2"></i>Sipariş Ürünleri
                         </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body" id="orderDetailsModalBody">
                         <!-- Content will be populated dynamically -->

@@ -5,6 +5,7 @@ using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Orders.Queries.GetList;
 
@@ -26,6 +27,7 @@ public class GetListOrderQuery : IRequest<GetListResponse<GetListOrderListItemDt
         public async Task<GetListResponse<GetListOrderListItemDto>> Handle(GetListOrderQuery request, CancellationToken cancellationToken)
         {
             IPaginate<Order> orders = await _orderRepository.GetListAsync(
+                include: o => o.Include(order => order.Items),
                 index: request.PageRequest.PageIndex,
                 size: request.PageRequest.PageSize, 
                 cancellationToken: cancellationToken

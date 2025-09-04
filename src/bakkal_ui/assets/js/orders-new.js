@@ -66,6 +66,9 @@ function initializeElements() {
     if (addOrderModal) {
         addModalInstance = new bootstrap.Modal(addOrderModal);
     }
+    if (addItemModal) {
+        addItemModalInstance = new bootstrap.Modal(addItemModal);
+    }
     
     // DataTable'ı başlat
     if (ordersTable) {
@@ -243,14 +246,14 @@ function setupEventListeners() {
     // Add item button
     const addItemBtn = document.getElementById('add-item-btn');
     if (addItemBtn) {
-        addItemBtn.addEventListener('click', addItemToTable);
+        addItemBtn.addEventListener('click', openAddItemModal);
     }
     
-    // Save item button (artık kullanılmıyor)
-    // const saveItemBtn = document.getElementById('save-item-btn');
-    // if (saveItemBtn) {
-    //     saveItemBtn.addEventListener('click', saveItem);
-    // }
+    // Save item button
+    const saveItemBtn = document.getElementById('save-item-btn');
+    if (saveItemBtn) {
+        saveItemBtn.addEventListener('click', saveItem);
+    }
     
     // Product selection change
     const productSelect = document.getElementById('item-product-select');
@@ -523,67 +526,6 @@ function handleProductSelection() {
 }
 
 /**
- * Add item to table from main modal
- */
-function addItemToTable() {
-    const productSelect = document.getElementById('item-product-select');
-    const productNameInput = document.getElementById('item-product-name-input');
-    const quantityInput = document.getElementById('item-quantity-input');
-    
-    const productId = productSelect.value || null;
-    const productName = productNameInput.value.trim();
-    const quantity = parseInt(quantityInput.value);
-    
-    // Validate
-    let isValid = true;
-    
-    if (!productName) {
-        productNameInput.classList.add('is-invalid');
-        isValid = false;
-    } else {
-        productNameInput.classList.remove('is-invalid');
-    }
-    
-    if (!quantity || quantity <= 0) {
-        quantityInput.classList.add('is-invalid');
-        isValid = false;
-    } else {
-        quantityInput.classList.remove('is-invalid');
-    }
-    
-    if (!isValid) return;
-    
-    // Check for duplicate
-    const existingItem = itemsData.find(item => item.productName.toLowerCase() === productName.toLowerCase());
-    if (existingItem) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Uyarı',
-            text: 'Bu ürün zaten eklenmiş!'
-        });
-        return;
-    }
-    
-    // Add item
-    const newItem = {
-        productId: productId,
-        productName: productName,
-        quantity: quantity,
-        unitPrice: 0
-    };
-    
-    itemsData.push(newItem);
-    updateItemsTable();
-    
-    // Clear inputs
-    productSelect.value = '';
-    productNameInput.value = '';
-    quantityInput.value = '';
-    productNameInput.classList.remove('is-invalid', 'is-valid');
-    quantityInput.classList.remove('is-invalid', 'is-valid');
-}
-
-/**
  * Open add item modal
  */
 function openAddItemModal() {
@@ -645,31 +587,35 @@ function saveItem() {
  * Update items table display
  */
 function updateItemsTable() {
-    const tableBody = document.getElementById('items-table-body');
-    const noItemsRow = document.getElementById('no-items-row');
+    const tableBody = document.getElementById('modal-items-table-body');
+    const noItemsMessage = document.getElementById('modal-no-items-message');
+    const modalTable = document.getElementById('modal-items-table');
     
     if (!tableBody) return;
     
-    // Clear existing rows except the no-items row
-    const existingRows = tableBody.querySelectorAll('tr:not(#no-items-row)');
-    existingRows.forEach(row => row.remove());
+    tableBody.innerHTML = '';
     
     if (itemsData.length === 0) {
-        if (noItemsRow) noItemsRow.style.display = '';
+        noItemsMessage.style.display = 'block';
+        modalTable.style.display = 'none';
     } else {
-        if (noItemsRow) noItemsRow.style.display = 'none';
+        noItemsMessage.style.display = 'none';
+        modalTable.style.display = 'table';
         
         itemsData.forEach((item, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>
                     <strong>${escapeHtml(item.productName)}</strong>
+                    ${item.productId ? '<small class="text-muted d-block">Sistem Ürünü</small>' : '<small class="text-muted d-block">Manuel Giriş</small>'}
                 </td>
-                <td><span class="badge bg-info text-dark">${item.quantity}</span></td>
-                <td class="text-center">
-                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeItem(${index})" title="Sil">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                <td><span class="badge bg-primary">${item.quantity}</span></td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-danger" onclick="removeItem(${index})" title="Sil">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </div>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -777,11 +723,6 @@ async function handleAddFormSubmit(event) {
         
         showNotification('Sipariş başarıyla kaydedildi!', 'success');
         
-        // Reset form and button state
-        resetMainModal();
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-        
         // Close modal and refresh table
         addModalInstance.hide();
         loadOrders();
@@ -883,18 +824,25 @@ function showOrderDetailsModal(orderDetails) {
     if (orderDetails.items && orderDetails.items.length > 0) {
         itemsHtml = orderDetails.items.map((item, index) => `
             <tr>
+                <td class="text-center">
+                    <span class="badge bg-primary">${index + 1}</span>
+                </td>
                 <td>
-                    <div class="fw-semibold text-dark">${escapeHtml(item.productName)}</div>
+                    <div class="fw-semibold">${escapeHtml(item.productName)}</div>
+                    ${item.productId ? 
+                        '<small class="text-muted"><i class="fas fa-check me-1"></i>Sistem Ürünü</small>' : 
+                        '<small class="text-muted"><i class="fas fa-edit me-1"></i>Manuel Giriş</small>'
+                    }
                 </td>
                 <td class="text-center">
-                    <span class="badge bg-success text-white fs-6 px-3 py-2">${item.quantity}</span>
+                    <span class="badge bg-success fs-6 px-3 py-2">${item.quantity}</span>
                 </td>
             </tr>
         `).join('');
     } else {
         itemsHtml = `
             <tr>
-                <td colspan="2" class="text-center text-muted py-5">
+                <td colspan="3" class="text-center text-muted py-5">
                     <i class="fas fa-box-open fa-3x mb-3"></i>
                     <br>
                     <h5>Henüz ürün eklenmemiş</h5>
@@ -916,11 +864,12 @@ function showOrderDetailsModal(orderDetails) {
         </div>
         
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead class="table-light">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
                     <tr>
+                        <th class="text-center" style="width: 10%;">#</th>
                         <th style="width: 70%;">Ürün Adı</th>
-                        <th class="text-center" style="width: 30%;">Miktar</th>
+                        <th class="text-center" style="width: 20%;">Miktar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -943,11 +892,11 @@ function createOrderDetailsModal() {
         <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header bg-light">
-                        <h5 class="modal-title text-dark" id="orderDetailsModalLabel">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="orderDetailsModalLabel">
                             <i class="fas fa-clipboard-list me-2"></i>Sipariş Ürünleri
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body" id="orderDetailsModalBody">
                         <!-- Content will be populated dynamically -->

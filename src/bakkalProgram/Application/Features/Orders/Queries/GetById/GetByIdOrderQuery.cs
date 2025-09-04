@@ -28,7 +28,7 @@ public class GetByIdOrderQuery : IRequest<GetByIdOrderResponse>
         {
             Order? order = await _orderRepository.GetAsync(
                 predicate: o => o.Id == request.Id, 
-                include: o => o.Include(x => x.Product).Include(x => x.Customer),
+                include: o => o.Include(order => order.Items).Include(order => order.Customer!),
                 cancellationToken: cancellationToken);
             await _orderBusinessRules.OrderShouldExistWhenSelected(order);
 

@@ -5,12 +5,19 @@ namespace Application.Features.Orders.Commands.Create;
 public class CreatedOrderResponse : IResponse
 {
     public Guid Id { get; set; }
-    public required string ProductName { get; set; }
-    public int Quantity { get; set; }
     public required string CustomerName { get; set; }
     public string? CustomerSurname { get; set; }
     public DateTime DeliveryDate { get; set; }
     public bool isPaid { get; set; }
     public bool IsDelivered { get; set; }
+    public List<CreatedOrderItemResponse> Items { get; set; } = new();
+}
 
+public class CreatedOrderItemResponse
+{
+    public Guid Id { get; set; }
+    public Guid? ProductId { get; set; }
+    public required string ProductName { get; set; }
+    public int Quantity { get; set; }
+    public decimal? UnitPrice { get; set; }
 }

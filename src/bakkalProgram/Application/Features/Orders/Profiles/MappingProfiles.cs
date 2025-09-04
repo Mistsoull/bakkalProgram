@@ -16,8 +16,11 @@ public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
-        CreateMap<CreateOrderCommand, Order>();
-        CreateMap<Order, CreatedOrderResponse>();
+        CreateMap<CreateOrderCommand, Order>()
+            .ForMember(dest => dest.Items, opt => opt.Ignore()); // Items manually handled in command handler
+        CreateMap<Order, CreatedOrderResponse>()
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+        CreateMap<OrderItem, CreatedOrderItemResponse>();
 
         CreateMap<UpdateOrderCommand, Order>();
         CreateMap<Order, UpdatedOrderResponse>();
@@ -36,7 +39,10 @@ public class MappingProfiles : Profile
             .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.Name : src.CustomerName))
             .ForMember(dest => dest.CustomerSurname, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.Surname : src.CustomerSurname));
 
-        CreateMap<Order, GetListOrderListItemDto>();
+        // Updated mappings for new structure
+        CreateMap<Order, GetListOrderListItemDto>()
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+        CreateMap<OrderItem, OrderItemDto>();
         CreateMap<IPaginate<Order>, GetListResponse<GetListOrderListItemDto>>();
 
         CreateMap<Order, GetTodaysOrdersListItemDto>()
