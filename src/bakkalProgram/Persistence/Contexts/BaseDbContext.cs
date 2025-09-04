@@ -14,6 +14,9 @@ public class BaseDbContext : DbContext
     public DbSet<OnCredit> OnCredits { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<Supplier> Suppliers { get; set; }
+    public DbSet<ProcurementOrder> ProcurementOrders { get; set; }
+    public DbSet<ProcurementOrderItem> ProcurementOrderItems { get; set; }
 
     public BaseDbContext(DbContextOptions dbContextOptions, IConfiguration configuration)
         : base(dbContextOptions)

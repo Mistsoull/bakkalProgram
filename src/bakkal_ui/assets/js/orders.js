@@ -72,6 +72,52 @@ function getRandomAvatar() {
 }
 
 /**
+ * Sipariş toplam tutarını hesapla (miktar x ürün fiyatı)
+ * @param {Object} order - Sipariş verisi
+ * @returns {Promise<number>} - Toplam tutar
+ */
+async function calculateOrderTotal(order) {
+    // Eğer sipariş verisinde fiyat varsa direkt kullan
+    if (order.productPrice && order.productPrice > 0) {
+        return order.quantity * order.productPrice;
+    }
+    
+    // Yoksa API'den ürün fiyatını al
+    try {
+        const productsResponse = await apiService.fetchGetAll('Products');
+        let products = [];
+        if (productsResponse && productsResponse.items && Array.isArray(productsResponse.items)) {
+            products = productsResponse.items;
+        } else if (Array.isArray(productsResponse)) {
+            products = productsResponse;
+        }
+        
+        const product = products.find(p => p.name === order.productName);
+        if (product && product.price) {
+            return order.quantity * product.price;
+        }
+    } catch (error) {
+        console.error('Ürün fiyatı alınırken hata:', error);
+    }
+    
+    // Fiyat bulunamadıysa 0 döndür
+    return 0;
+}
+
+/**
+ * Gruplandırılmış siparişlerin toplam tutarını hesapla
+ * @param {Array} orders - Sipariş listesi
+ * @returns {Promise<number>} - Toplam tutar
+ */
+async function calculateGroupTotal(orders) {
+    let total = 0;
+    for (const order of orders) {
+        total += await calculateOrderTotal(order);
+    }
+    return total;
+}
+
+/**
  * DataTable'ı başlat
  */
 function initializeDataTable() {
@@ -99,7 +145,7 @@ function initializeDataTable() {
                     extend: 'copy',
                     text: '<i class="fas fa-copy me-1"></i>Kopyala',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5], // Müşteri, ürün, miktar, tarih, durum
+                        columns: [0, 1, 2, 3, 4, 5, 6], // Müşteri, ürün, miktar, toplam tutar, tarih, durum, ödeme
                         format: {
                             body: function (data, row, column, node) {
                                 // HTML etiketlerini temizle
@@ -113,7 +159,7 @@ function initializeDataTable() {
                     text: '<i class="fas fa-file-csv me-1"></i>CSV',
                     filename: 'siparisler_' + new Date().toISOString().slice(0,10),
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5],
+                        columns: [0, 1, 2, 3, 4, 5, 6],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -127,7 +173,7 @@ function initializeDataTable() {
                     filename: 'siparisler_' + new Date().toISOString().slice(0,10),
                     title: 'Sipariş Listesi',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5],
+                        columns: [0, 1, 2, 3, 4, 5, 6],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -143,7 +189,7 @@ function initializeDataTable() {
                     orientation: 'landscape',
                     pageSize: 'A4',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5],
+                        columns: [0, 1, 2, 3, 4, 5, 6],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -156,7 +202,7 @@ function initializeDataTable() {
                     text: '<i class="fas fa-print me-1"></i>Yazdır',
                     title: 'Sipariş Listesi',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5],
+                        columns: [0, 1, 2, 3, 4, 5, 6],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -555,10 +601,10 @@ async function loadOrders() {
             console.log('Gruplandırılmış siparişler:', groupedOrders);
             
             // Her gruplandırılmış sipariş için satır verisi oluştur ve tabloya ekle
-            groupedOrders.forEach(orderGroup => {
-                const rowData = createOrderRowData(orderGroup);
+            for (const orderGroup of groupedOrders) {
+                const rowData = await createOrderRowData(orderGroup);
                 ordersDataTable.row.add(rowData);
-            });
+            }
             
             // Ürün özetini güncelle
             updateProductSummary(orders);
@@ -742,9 +788,9 @@ function showErrorState() {
 /**
  * DataTable için sipariş satır verisi oluştur (hem tek hem de gruplandırılmış siparişler için)
  * @param {Object} orderOrGroup - API'den gelen sipariş verisi veya gruplandırılmış sipariş verisi
- * @returns {Array} - DataTable satır verisi
+ * @returns {Promise<Array>} - DataTable satır verisi
  */
-function createOrderRowData(orderOrGroup) {
+async function createOrderRowData(orderOrGroup) {
     // Debug: Sipariş verisini logla
     console.log('Sipariş verisi:', orderOrGroup);
     
@@ -760,6 +806,7 @@ function createOrderRowData(orderOrGroup) {
         
         const orderCount = orderGroup.orders.length;
         const statusBadges = getMixedStatusBadge(orderGroup.allPaid, orderGroup.allDelivered, orderCount, orderGroup.orders);
+        const totalAmount = await calculateGroupTotal(orderGroup.orders);
         
         return [
             // Müşteri Adı Soyadı
@@ -776,6 +823,12 @@ function createOrderRowData(orderOrGroup) {
             
             // Toplam Miktar
             `<span class="badge bg-info-subtle text-info">${orderGroup.totalQuantity} adet</span>`,
+            
+            // Toplam Tutar
+            `<div class="d-flex flex-column">
+                <span class="fw-semibold text-success fs-5">₺${totalAmount.toFixed(2)}</span>
+                ${orderCount > 1 ? `<small class="text-muted">${orderCount} sipariş toplamı</small>` : ''}
+            </div>`,
             
             // Teslimat Tarihi Aralığı
             `<p class="mb-0 fw-normal">${formatDateRange(orderGroup.earliestDeliveryDate, orderGroup.latestDeliveryDate)}</p>`,
@@ -795,6 +848,7 @@ function createOrderRowData(orderOrGroup) {
         const fullCustomerName = order.customerSurname ? 
             `${order.customerName} ${order.customerSurname}` : 
             order.customerName;
+        const totalAmount = await calculateOrderTotal(order);
 
         return [
             // Müşteri Adı Soyadı
@@ -811,6 +865,9 @@ function createOrderRowData(orderOrGroup) {
             
             // Miktar
             `<span class="badge bg-info-subtle text-info">${order.quantity} adet</span>`,
+            
+            // Toplam Tutar
+            `<span class="fw-semibold text-success fs-5">₺${totalAmount.toFixed(2)}</span>`,
             
             // Teslimat Tarihi
             `<p class="mb-0 fw-normal">${formatDate(order.deliveryDate)}</p>`,

@@ -22,6 +22,8 @@ using Application.Services.Employees;
 using Application.Services.OnCredits;
 using Application.Services.Orders;
 using Application.Services.Products;
+using Application.Services.Suppliers;
+using Application.Services.ProcurementOrders;
 
 namespace Application;
 
@@ -68,6 +70,9 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IOnCreditService, OnCreditManager>();
         services.AddScoped<IOrderService, OrderManager>();
         services.AddScoped<IProductService, ProductManager>();
+        services.AddScoped<ISupplierService, SupplierManager>();
+        services.AddScoped<IProcurementOrderService, ProcurementOrderManager>();
+        services.AddScoped<ISupplierService, SupplierManager>();
         return services;
     }
 

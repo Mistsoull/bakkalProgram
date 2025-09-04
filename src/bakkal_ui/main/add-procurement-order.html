@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="vertical">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Favicon icon-->
+  <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+
+  <!-- Core Css -->
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+
+  <title>Tedarik Siparişi Ekle | Bakkal CRM</title>
+</head>
+
+<body>
+  <!-- Preloader -->
+  <div class="preloader">
+    <img src="../assets/images/logos/favicon.png" alt="loader" class="lds-ripple img-fluid" />
+  </div>
+
+  <div id="main-wrapper">
+    <!-- Sidebar Start -->
+    <aside class="left-sidebar with-vertical">
+      <div>
+        <!-- Brand -->
+        <div class="brand-logo d-flex align-items-center justify-content-between">
+          <a href="dashboard.html" class="text-nowrap logo-img">
+            <img src="../assets/images/logos/logo-light.svg" class="dark-logo" alt="Logo-Dark" />
+            <img src="../assets/images/logos/logo-dark.svg" class="light-logo" alt="Logo-light" />
+          </a>
+          <a href="javascript:void(0)" class="sidebartoggler ms-auto text-decoration-none fs-5 d-block d-xl-none">
+            <i class="ti ti-x"></i>
+          </a>
+        </div>
+
+        <!-- Sidebar navigation-->
+        <nav class="sidebar-nav scroll-sidebar" data-simplebar>
+          <ul id="sidebarnav">
+            <!-- Home -->
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Ana Sayfa</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="dashboard.html" aria-expanded="false">
+                <span>
+                  <i class="ti ti-aperture"></i>
+                </span>
+                <span class="hide-menu">Dashboard</span>
+              </a>
+            </li>
+
+            <!-- Inventory Management -->
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Envanter Yönetimi</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                <span class="d-flex">
+                  <i class="ti ti-package"></i>
+                </span>
+                <span class="hide-menu">Ürünler</span>
+              </a>
+              <ul aria-expanded="false" class="collapse first-level">
+                <li class="sidebar-item">
+                  <a href="products.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Ürün Listesi</span>
+                  </a>
+                </li>
+                <li class="sidebar-item">
+                  <a href="add-product.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Ürün Ekle</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                <span class="d-flex">
+                  <i class="ti ti-category"></i>
+                </span>
+                <span class="hide-menu">Kategoriler</span>
+              </a>
+              <ul aria-expanded="false" class="collapse first-level">
+                <li class="sidebar-item">
+                  <a href="categories.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Kategori Listesi</span>
+                  </a>
+                </li>
+                <li class="sidebar-item">
+                  <a href="add-category.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Kategori Ekle</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Procurement Management -->
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Tedarik Yönetimi</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                <span class="d-flex">
+                  <i class="ti ti-truck-delivery"></i>
+                </span>
+                <span class="hide-menu">Tedarik Siparişleri</span>
+              </a>
+              <ul aria-expanded="false" class="collapse first-level">
+                <li class="sidebar-item">
+                  <a href="procurement-orders.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Sipariş Listesi</span>
+                  </a>
+                </li>
+                <li class="sidebar-item">
+                  <a href="add-procurement-order.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Sipariş Ekle</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Customer Relations -->
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Müşteri İlişkileri</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                <span class="d-flex">
+                  <i class="ti ti-users"></i>
+                </span>
+                <span class="hide-menu">Müşteriler</span>
+              </a>
+              <ul aria-expanded="false" class="collapse first-level">
+                <li class="sidebar-item">
+                  <a href="customers.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Müşteri Listesi</span>
+                  </a>
+                </li>
+                <li class="sidebar-item">
+                  <a href="add-customer.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Müşteri Ekle</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Staff Management -->
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Personel Yönetimi</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                <span class="d-flex">
+                  <i class="ti ti-user-check"></i>
+                </span>
+                <span class="hide-menu">Personel</span>
+              </a>
+              <ul aria-expanded="false" class="collapse first-level">
+                <li class="sidebar-item">
+                  <a href="employees.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Personel Listesi</span>
+                  </a>
+                </li>
+                <li class="sidebar-item">
+                  <a href="add-employee.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Personel Ekle</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Sales & Orders -->
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Satış & Siparişler</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                <span class="d-flex">
+                  <i class="ti ti-shopping-cart"></i>
+                </span>
+                <span class="hide-menu">Siparişler</span>
+              </a>
+              <ul aria-expanded="false" class="collapse first-level">
+                <li class="sidebar-item">
+                  <a href="orders.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Sipariş Listesi</span>
+                  </a>
+                </li>
+                <li class="sidebar-item">
+                  <a href="add-order.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Sipariş Ekle</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                <span class="d-flex">
+                  <i class="ti ti-credit-card"></i>
+                </span>
+                <span class="hide-menu">Veresiye</span>
+              </a>
+              <ul aria-expanded="false" class="collapse first-level">
+                <li class="sidebar-item">
+                  <a href="on-credit.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Veresiye Listesi</span>
+                  </a>
+                </li>
+                <li class="sidebar-item">
+                  <a href="add-on-credit.html" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                      <i class="ti ti-circle"></i>
+                    </div>
+                    <span class="hide-menu">Veresiye Ekle</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+    <!--  Sidebar End -->
+
+    <div class="page-wrapper">
+      <!--  Header Start -->
+      <header class="topbar">
+        <div class="with-vertical">
+          <nav class="navbar navbar-expand-lg p-0">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
+                  <i class="ti ti-menu-2"></i>
+                </a>
+              </li>
+            </ul>
+
+            <div class="d-block d-lg-none">
+              <img src="../assets/images/logos/logo-dark.svg" class="dark-logo" alt="Logo-Dark" />
+              <img src="../assets/images/logos/logo-light.svg" class="light-logo" alt="Logo-light" />
+            </div>
+
+            <button class="navbar-toggler p-0 border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="p-2">
+                <i class="ti ti-dots fs-7"></i>
+              </span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+              <div class="d-flex align-items-center justify-content-between">
+                <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-center">
+                  <li class="nav-item dropdown">
+                    <a class="nav-link pe-0" href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown" aria-expanded="false">
+                      <div class="d-flex align-items-center">
+                        <div class="user-profile-img">
+                          <img src="../assets/images/profile/user-1.jpg" class="rounded-circle" width="35" height="35" alt="modernize-img" />
+                        </div>
+                      </div>
+                    </a>
+                    <div class="dropdown-menu content-dd dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
+                      <div class="profile-dropdown position-relative" data-simplebar>
+                        <div class="py-3 px-7 pb-0">
+                          <h5 class="mb-0 fs-5 fw-semibold">Kullanıcı Profili</h5>
+                        </div>
+                        <div class="d-flex align-items-center py-9 mx-7 border-bottom">
+                          <img src="../assets/images/profile/user-1.jpg" class="rounded-circle" width="80" height="80" alt="modernize-img" />
+                          <div class="ms-3">
+                            <h5 class="mb-1 fs-3">Bakkal Yöneticisi</h5>
+                            <span class="mb-1 d-block">Administrator</span>
+                            <p class="mb-0 d-flex align-items-center gap-2">
+                              <i class="ti ti-mail fs-4"></i> info@bakkal.com
+                            </p>
+                          </div>
+                        </div>
+                        <div class="message-body">
+                          <a href="javascript:void(0)" class="py-8 px-7 mt-8 d-flex align-items-center">
+                            <span class="d-flex align-items-center justify-content-center text-bg-light rounded-1 p-6">
+                              <img src="../assets/images/svgs/icon-account.svg" alt="modernize-img" width="24" height="24">
+                            </span>
+                            <div class="w-100 ps-3">
+                              <h6 class="mb-1 fs-3 fw-semibold lh-base">Profilim</h6>
+                              <span class="fs-2 d-block text-body-secondary">Hesap Ayarları</span>
+                            </div>
+                          </a>
+                        </div>
+                        <div class="d-grid py-4 px-7 pt-8">
+                          <a href="../main/authentication-login.html" class="btn btn-outline-primary">Çıkış Yap</a>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+        </div>
+      </header>
+      <!--  Header End -->
+
+      <div class="body-wrapper">
+        <div class="container-fluid">
+          <!-- Breadcrumb -->
+          <div class="card bg-info-subtle shadow-none position-relative overflow-hidden">
+            <div class="card-body px-4 py-3">
+              <div class="row align-items-center">
+                <div class="col-9">
+                  <h4 class="fw-semibold mb-8">Tedarik Siparişi Ekle</h4>
+                  <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                      <li class="breadcrumb-item">
+                        <a class="text-muted text-decoration-none" href="dashboard.html">Ana Sayfa</a>
+                      </li>
+                      <li class="breadcrumb-item">
+                        <a class="text-muted text-decoration-none" href="procurement-orders.html">Tedarik Siparişleri</a>
+                      </li>
+                      <li class="breadcrumb-item" aria-current="page">Sipariş Ekle</li>
+                    </ol>
+                  </nav>
+                </div>
+                <div class="col-3">
+                  <div class="text-center mb-n5">
+                    <img src="../assets/images/breadcrumb/ChatBc.png" alt="modernize-img" class="img-fluid mb-n4">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Procurement Order Add Form -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header text-bg-primary">
+                  <h4 class="mb-0 text-white">
+                    <i class="ti ti-truck-delivery me-2"></i>
+                    Yeni Tedarik Siparişi Ekle
+                  </h4>
+                </div>
+                <form id="procurementOrderForm">
+                  <div class="card-body">
+                    <!-- Supplier Information -->
+                    <div class="row">
+                      <div class="col-md-12">
+                        <h5 class="card-title mb-3">
+                          <i class="ti ti-building-store me-2 text-primary"></i>
+                          Tedarikçi Bilgileri
+                        </h5>
+                      </div>
+                    </div>
+                    
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <select class="form-select" id="supplierId" name="supplierId" required>
+                            <option value="">Tedarikçi seçiniz...</option>
+                          </select>
+                          <label for="supplierId">
+                            <i class="ti ti-building-store me-2 fs-4"></i>Tedarikçi *
+                          </label>
+                        </div>
+                        <div class="invalid-feedback">
+                          Lütfen bir tedarikçi seçiniz.
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <input type="text" class="form-control" id="supplierName" name="supplierName" placeholder="Tedarikçi adını giriniz" required>
+                          <label for="supplierName">
+                            <i class="ti ti-user me-2 fs-4"></i>Tedarikçi Adı *
+                          </label>
+                        </div>
+                        <div class="invalid-feedback">
+                          Lütfen tedarikçi adını giriniz.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <input type="date" class="form-control" id="orderDate" name="orderDate" required>
+                          <label for="orderDate">
+                            <i class="ti ti-calendar me-2 fs-4"></i>Sipariş Tarihi *
+                          </label>
+                        </div>
+                        <div class="invalid-feedback">
+                          Lütfen sipariş tarihini seçiniz.
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <input type="date" class="form-control" id="expectedDeliveryDate" name="expectedDeliveryDate">
+                          <label for="expectedDeliveryDate">
+                            <i class="ti ti-calendar-event me-2 fs-4"></i>Tahmini Teslim Tarihi
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-floating mb-3">
+                          <textarea class="form-control" id="notes" name="notes" placeholder="Notlar" style="height: 80px"></textarea>
+                          <label for="notes">
+                            <i class="ti ti-note me-2 fs-4"></i>Notlar
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Order Items Section -->
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                          <h5 class="card-title mb-0">
+                            <i class="ti ti-package me-2 text-primary"></i>
+                            Sipariş Ürünleri
+                          </h5>
+                          <button type="button" class="btn btn-primary btn-sm" id="addItemBtn">
+                            <i class="ti ti-plus me-1"></i>
+                            Ürün Ekle
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Items Table -->
+                    <div class="table-responsive">
+                      <table class="table table-striped" id="itemsTable">
+                        <thead>
+                          <tr>
+                            <th width="400">Ürün Adı</th>
+                            <th width="150">Miktar</th>
+                            <th width="80">İşlem</th>
+                          </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                          <!-- Items will be added here dynamically -->
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="row" id="noItemsMessage">
+                      <div class="col-12">
+                        <div class="alert alert-info">
+                          <i class="ti ti-info-circle me-2"></i>
+                          Henüz ürün eklenmedi. "Ürün Ekle" butonu ile ürün ekleyebilirsiniz.
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="row mt-4">
+                      <div class="col-12">
+                        <div class="d-flex align-items-center justify-content-end gap-6">
+                          <a href="procurement-orders.html" class="btn btn-outline-secondary">
+                            <i class="ti ti-arrow-left me-2"></i>
+                            İptal
+                          </a>
+                          <button type="reset" class="btn btn-outline-warning">
+                            <i class="ti ti-refresh me-2"></i>
+                            Temizle
+                          </button>
+                          <button type="submit" class="btn btn-primary">
+                            <i class="ti ti-device-floppy me-2"></i>
+                            Sipariş Kaydet
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Item Modal -->
+          <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="addItemModalLabel">
+                    <i class="ti ti-package me-2"></i>
+                    Ürün Ekle
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form id="addItemForm">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-floating mb-3">
+                          <select class="form-select" id="modalProductId" name="productId">
+                            <option value="">Ürün seçiniz...</option>
+                          </select>
+                          <label for="modalProductId">
+                            <i class="ti ti-package me-2 fs-4"></i>Ürün
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-floating mb-3">
+                          <input type="text" class="form-control" id="modalProductName" name="productName" placeholder="Ürün adını giriniz" required>
+                          <label for="modalProductName">
+                            <i class="ti ti-package me-2 fs-4"></i>Ürün Adı *
+                          </label>
+                        </div>
+                        <div class="invalid-feedback">
+                          Lütfen ürün adını giriniz.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-floating mb-3">
+                          <input type="number" class="form-control" id="modalQuantity" name="quantity" placeholder="Miktar" min="1" required>
+                          <label for="modalQuantity">
+                            <i class="ti ti-hash me-2 fs-4"></i>Miktar *
+                          </label>
+                        </div>
+                        <div class="invalid-feedback">
+                          Lütfen geçerli bir miktar giriniz.
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ti ti-x me-2"></i>
+                    İptal
+                  </button>
+                  <button type="button" class="btn btn-primary" id="saveItemBtn">
+                    <i class="ti ti-check me-2"></i>
+                    Ürün Ekle
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Information Card -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card bg-light-info">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="me-3">
+                      <i class="ti ti-info-circle fs-6 text-info"></i>
+                    </div>
+                    <div>
+                      <h6 class="fw-semibold mb-1 text-info">Tedarik Siparişi Bilgileri Hakkında</h6>
+                      <p class="mb-0 text-dark">
+                        Tedarik siparişi oluştururken tedarikçi ve sipariş tarihi bilgileri zorunludur. 
+                        "Ürün Ekle" butonu ile istediğiniz kadar ürün ekleyebilirsiniz. 
+                        Her ürün için ayrı miktar ve fiyat belirleyebilirsiniz.
+                        Sipariş toplam tutarı otomatik olarak hesaplanacaktır.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dark-transparent sidebartoggler"></div>
+
+  <!-- Import Js Files -->
+  <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/libs/simplebar/dist/simplebar.min.js"></script>
+  <script src="../assets/js/theme/app.horizontal.init.js"></script>
+  <script src="../assets/js/theme/theme.js"></script>
+  <script src="../assets/js/theme/app.min.js"></script>
+  <script src="../assets/js/theme/sidebarmenu.js"></script>
+
+  <!-- Page specific JS -->
+  <script>
+    // Sayfa yüklendiğinde procurement-orders.html'ye yönlendir
+    window.location.href = 'procurement-orders.html';
+  </script>
+</body>
+
+</html>

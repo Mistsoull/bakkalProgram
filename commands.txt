@@ -1,4 +1,4 @@
-dotnet ef migrations add newdb --project bakkalProgram\Persistence --startup-project bakkalProgram\WebApi   
+dotnet ef migrations add supply --project bakkalProgram\Persistence --startup-project bakkalProgram\WebApi   
 dotnet ef database update --project bakkalProgram\Persistence --startup-project bakkalProgram\WebApi  
 cd src\bakkalProgram\WebAPI
 .\deploy.ps1
