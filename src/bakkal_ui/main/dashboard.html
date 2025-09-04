@@ -171,7 +171,7 @@
 
     #orders-datatable th:nth-child(2),
     #orders-datatable td:nth-child(2) {
-      width: 20%;
+      width: 30%;
     }
 
     #orders-datatable th:nth-child(3),
@@ -181,12 +181,12 @@
 
     #orders-datatable th:nth-child(4),
     #orders-datatable td:nth-child(4) {
-      width: 15%;
+      width: 10%;
     }
 
     #orders-datatable th:nth-child(5),
     #orders-datatable td:nth-child(5) {
-      width: 15%;
+      width: 10%;
     }
 
     #orders-datatable th:nth-child(6),
@@ -543,10 +543,9 @@
                       <h5 class="card-title fw-semibold">Bugün Teslim Edilecek Siparişler</h5>
                     </div>
                     <div>
-                      <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#addOrderModal">
+                      <a href="orders.html" class="btn btn-primary">
                         <i class="fas fa-plus me-2"></i>Yeni Sipariş Ekle
-                      </button>
+                      </a>
                     </div>
                   </div>
                   <div class="table-responsive">
@@ -557,16 +556,7 @@
                             <h6 class="fs-4 fw-semibold mb-0">Müşteri Adı Soyadı</h6>
                           </th>
                           <th>
-                            <h6 class="fs-4 fw-semibold mb-0">Ürün</h6>
-                          </th>
-                          <th>
-                            <h6 class="fs-4 fw-semibold mb-0">Miktar</h6>
-                          </th>
-                          <th>
                             <h6 class="fs-4 fw-semibold mb-0">Teslimat Tarihi</h6>
-                          </th>
-                          <th>
-                            <h6 class="fs-4 fw-semibold mb-0">Durum</h6>
                           </th>
                           <th>
                             <h6 class="fs-4 fw-semibold mb-0">Ödeme Durumu</h6>
@@ -582,102 +572,6 @@
                     </table>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Add Order Modal -->
-          <div class="modal fade" id="addOrderModal" tabindex="-1" aria-labelledby="addOrderModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="addOrderModalLabel">
-                    <i class="fas fa-plus me-2"></i>Yeni Sipariş Ekle
-                  </h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="add-order-form">
-                  <div class="modal-body">
-                    <div class="row">
-                      <!-- Ürün Seçimi -->
-                      <div class="col-md-6 mb-3">
-                        <label for="order-product-select" class="form-label">Ürün Seç (Opsiyonel)</label>
-                        <select class="form-select" id="order-product-select">
-                          <option value="">Ürün Seç (Opsiyonel)</option>
-                        </select>
-                      </div>
-
-                      <!-- Ürün Adı Manuel Giriş -->
-                      <div class="col-md-6 mb-3">
-                        <label for="order-product-name-input" class="form-label">Ürün Adı <span
-                            class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="order-product-name-input"
-                          placeholder="Ürün adını giriniz" required>
-                        <div class="form-text">Yukarıdan seçim yaparsanız otomatik doldurulur</div>
-                      </div>
-
-                      <!-- Miktar -->
-                      <div class="col-md-6 mb-3">
-                        <label for="order-quantity-input" class="form-label">Miktar <span
-                            class="text-danger">*</span></label>
-                        <input type="number" class="form-control" id="order-quantity-input" placeholder="Miktar giriniz"
-                          min="1" required>
-                      </div>
-
-                      <!-- Müşteri Seçimi -->
-                      <div class="col-md-6 mb-3">
-                        <label for="order-customer-select" class="form-label">Müşteri Seç (Opsiyonel)</label>
-                        <select class="form-select" id="order-customer-select">
-                          <option value="">Müşteri Seç (Opsiyonel)</option>
-                        </select>
-                      </div>
-
-                      <!-- Müşteri Adı Manuel Giriş -->
-                      <div class="col-md-6 mb-3">
-                        <label for="order-customer-name-input" class="form-label">Müşteri Adı <span
-                            class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="order-customer-name-input"
-                          placeholder="Müşteri adını giriniz" required>
-                        <div class="form-text">Yukarıdan seçim yaparsanız otomatik doldurulur</div>
-                      </div>
-
-                      <!-- Müşteri Soyadı Manuel Giriş -->
-                      <div class="col-md-6 mb-3">
-                        <label for="order-customer-surname-input" class="form-label">Müşteri Soyadı</label>
-                        <input type="text" class="form-control" id="order-customer-surname-input"
-                          placeholder="Müşteri soyadını giriniz">
-                        <div class="form-text">Yukarıdan seçim yaparsanız otomatik doldurulur</div>
-                      </div>
-
-                      <!-- Teslimat Tarihi -->
-                      <div class="col-md-6 mb-3">
-                        <label for="order-delivery-date-input" class="form-label">Teslimat Tarihi <span
-                            class="text-danger">*</span></label>
-                        <input type="date" class="form-control" id="order-delivery-date-input" required>
-                      </div>
-
-                      <!-- Ödeme Durumu -->
-                      <div class="col-md-6 mb-3">
-                        <label for="order-payment-status-select" class="form-label">Ödeme Durumu <span
-                            class="text-danger">*</span></label>
-                        <select class="form-select" id="order-payment-status-select" required>
-                          <option value="">Ödeme durumu seçiniz</option>
-                          <option value="true">Ödendi</option>
-                          <option value="false">Ödenmedi</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                      <i class="fas fa-times me-2"></i>İptal
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                      <i class="fas fa-save me-2"></i>Siparişi Kaydet
-                    </button>
-                  </div>
-                </form>
               </div>
             </div>
           </div>
@@ -715,9 +609,6 @@
   <!-- API Service -->
   <script src="../assets/js/apiService.js"></script>
   
-  <!-- Orders Page Script -->
-  <script src="../assets/js/orders.js"></script>
-  
   <!-- Dashboard Services -->
   <script src="../assets/js/dashboardUtils.js"></script>
   <script src="../assets/js/dashboardService.js"></script>
@@ -725,6 +616,131 @@
   
   <!-- Dashboard Initialization -->
   <script>
+    // Global değişkenler
+    let ordersDataTable = null;
+    
+    // Order Status Mapping
+    const ORDER_STATUS_MAP = {
+        pending: { color: 'warning', icon: 'fas fa-clock', text: 'Bekliyor' },
+        paid: { color: 'info', icon: 'fas fa-credit-card', text: 'Ödendi' },
+        delivered: { color: 'primary', icon: 'fas fa-truck', text: 'Teslim Edildi' },
+        completed: { color: 'success', icon: 'fas fa-check-circle', text: 'Tamamlandı' }
+    };
+
+    /**
+     * HTML karakterlerini escape et
+     */
+    function escapeHtml(text) {
+        if (!text) return '';
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    /**
+     * Bildirim göster
+     */
+    function showNotification(message, type = 'info') {
+        const icon = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+        Swal.fire({
+            icon: icon,
+            title: type === 'success' ? 'Başarılı!' : type === 'error' ? 'Hata!' : 'Bilgi',
+            text: message,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    }
+
+    /**
+     * DataTable için yükleniyor durumunu göster
+     */
+    function showLoadingState() {
+        if (!ordersDataTable) return;
+        try {
+            ordersDataTable.processing(true);
+        } catch (error) {
+            console.warn('DataTable processing durumu ayarlanamadı:', error);
+        }
+    }
+
+    /**
+     * DataTable için boş durum göster
+     */
+    function showEmptyState() {
+        console.log('Bugün teslim edilecek sipariş bulunamadı');
+    }
+
+    /**
+     * DataTable için hata durumunu göster
+     */
+    function showErrorState() {
+        console.error('Siparişler yüklenirken hata oluştu');
+    }
+
+    /**
+     * DataTable için sipariş satır verisi oluştur
+     */
+    function createOrderRowData(order) {
+        console.log('Sipariş verisi:', order);
+
+        // Tarihleri formatla
+        const formatDate = (dateString) => {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('tr-TR');
+        };
+
+        // Durum belirleme
+        const getStatusInfo = (isPaid, isDelivered) => {
+            if (isPaid && isDelivered) {
+                return ORDER_STATUS_MAP.completed;
+            } else if (isPaid) {
+                return ORDER_STATUS_MAP.paid;
+            } else if (isDelivered) {
+                return ORDER_STATUS_MAP.delivered;
+            } else {
+                return ORDER_STATUS_MAP.pending;
+            }
+        };
+
+        const statusInfo = getStatusInfo(order.isPaid, order.isDelivered);
+        const customerFullName = order.customerSurname 
+            ? `${order.customerName} ${order.customerSurname}`
+            : order.customerName;
+
+        return [
+            // Müşteri
+            `<div class="text-truncate">
+                <div class="fw-semibold mb-1">${escapeHtml(customerFullName)}</div>
+            </div>`,
+            
+            // Teslim Tarihi
+            `<span class="text-nowrap">${formatDate(order.deliveryDate)}</span>`,
+            
+            // Ödeme Durumu
+            `<span class="badge bg-${order.isPaid ? 'success' : 'warning'}-subtle text-${order.isPaid ? 'success' : 'warning'}">
+                <i class="fas fa-${order.isPaid ? 'check' : 'clock'} me-1"></i>${order.isPaid ? 'Ödendi' : 'Ödenmedi'}
+            </span>`,
+            
+            // İşlemler
+            `<div class="d-flex gap-1">
+                <button class="btn btn-outline-info btn-sm" onclick="viewOrder('${order.id}')" title="Sipariş Detayı">
+                    <i class="ti ti-eye fs-6"></i>
+                </button>
+                <a href="orders.html" class="btn btn-outline-secondary btn-sm" title="Siparişler Sayfasına Git">
+                    <i class="ti ti-list fs-6"></i>
+                </a>
+            </div>`
+        ];
+    }
     // Dashboard için özel loadOrders fonksiyonu - bugünkü siparişleri getirir
     async function loadTodaysOrders() {
       if (!ordersDataTable) {
@@ -738,20 +754,25 @@
         // Yükleniyor durumunu göster
         showLoadingState();
         
-        // Bugünkü siparişler için GetTodaysOrders endpoint'ini kullan
-        // Bugünün tarihini ISO formatında hazırla
+        // Bugünkü tarihi al ve API'ye gönder
         const today = new Date();
         const todayISO = today.toISOString().split('T')[0]; // YYYY-MM-DD formatı
         
-        const response = await apiService.fetchGetAll('Orders/GetTodaysOrders', { date: todayISO });
+        // GetTodaysOrders endpoint'ini kullan
+        const response = await window.apiService.fetchGet(`Orders/GetTodaysOrders`, {
+          pageIndex: 0,
+          pageSize: 1000,
+          additionalParams: { date: todayISO }
+        });
         
-        // API yanıtının yapısını kontrol et
-        let orders = [];
-        if (response && response.items && Array.isArray(response.items)) {
-          orders = response.items;
-        } else if (Array.isArray(response)) {
-          orders = response;
+        if (!response) {
+          console.warn('Sipariş verisi alınamadı');
+          showEmptyState();
+          return;
         }
+
+        // Backend API'den bugünkü siparişler direkt olarak geliyor
+        const orders = response || [];
         
         console.log('API\'den gelen bugünkü sipariş verisi:', orders);
         
@@ -759,13 +780,9 @@
         ordersDataTable.clear();
 
         if (orders && orders.length > 0) {
-          // Siparişleri müşterilere göre gruplandır
-          const groupedOrders = groupOrdersByCustomer(orders);
-          console.log('Gruplandırılmış bugünkü siparişler:', groupedOrders);
-          
-          // Her gruplandırılmış sipariş için satır verisi oluştur ve tabloya ekle
-          groupedOrders.forEach(orderGroup => {
-            const rowData = createOrderRowData(orderGroup);
+          // Her sipariş için satır verisi oluştur ve tabloya ekle
+          orders.forEach(order => {
+            const rowData = createOrderRowData(order);
             ordersDataTable.row.add(rowData);
           });
         } else {
@@ -784,13 +801,12 @@
           stack: error.stack,
           name: error.name,
           apiServiceExists: !!window.apiService,
-          groupOrdersByCustomerExists: typeof groupOrdersByCustomer === 'function',
           ordersDataTableExists: !!ordersDataTable
         });
         
         showErrorState();
         // Kullanıcı dostu hata mesajı göster
-        showToast('error', 'Hata!', `Bugünkü siparişler yüklenirken bir hata oluştu: ${error.message}`);
+        showNotification(`Bugünkü siparişler yüklenirken bir hata oluştu: ${error.message}`, 'error');
       }
     }
 
@@ -800,12 +816,25 @@
         // Dashboard UI'ı başlat
         await dashboardUI.initialize();
         
-        // DataTable başlatıldıktan sonra bugünkü siparişleri yükle
-        setTimeout(() => {
-          if (ordersDataTable) {
-            loadTodaysOrders();
+        // DataTable'ı manuel olarak başlat (orders.js'nin otomatik başlatmasını engellemek için)
+        setTimeout(async () => {
+          if (!ordersDataTable) {
+            // DataTable'ı başlat
+            ordersDataTable = $('#orders-datatable').DataTable({
+              responsive: true,
+              pageLength: 10,
+              language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/tr.json'
+              },
+              columnDefs: [
+                { targets: -1, orderable: false } // Son kolon (işlemler) sıralanamaz
+              ]
+            });
           }
-        }, 1000);
+          
+          // Sadece bugünkü siparişleri yükle
+          await loadTodaysOrders();
+        }, 500);
         
       } catch (error) {
         console.error('Dashboard başlatma hatası:', error);
@@ -816,7 +845,122 @@
     window.addEventListener('beforeunload', function() {
       dashboardUI.destroy();
     });
+
+    // Sipariş detayını görüntüle
+    async function viewOrder(orderId) {
+      try {
+        showLoadingState();
+        
+        // Fetch order details from API
+        const orderDetails = await window.apiService.fetchGet(`Orders/${orderId}`);
+        
+        console.log('Order details:', orderDetails);
+        
+        // Show details modal
+        showOrderDetailsModal(orderDetails);
+        
+      } catch (error) {
+        console.error('Error fetching order details:', error);
+        showNotification('Sipariş detayları yüklenirken hata oluştu', 'error');
+      }
+    }
+
+    // Sipariş detay modalını göster
+    function showOrderDetailsModal(orderDetails) {
+      const modal = document.getElementById('orderDetailModal');
+      const modalTitle = document.getElementById('orderDetailModalLabel');
+      const modalBody = document.getElementById('orderDetailModalBody');
+      
+      const customerFullName = orderDetails.customerSurname 
+          ? `${orderDetails.customerName} ${orderDetails.customerSurname}`
+          : orderDetails.customerName;
+      
+      modalTitle.innerHTML = `<i class="fas fa-eye me-2"></i>Sipariş Detayları - ${escapeHtml(customerFullName)}`;
+      
+      let itemsHtml = '';
+      
+      if (orderDetails.items && orderDetails.items.length > 0) {
+          itemsHtml = orderDetails.items.map((item, index) => `
+              <tr>
+                  <td>
+                      <div class="fw-semibold text-dark">${escapeHtml(item.productName)}</div>
+                  </td>
+                  <td class="text-center">
+                      <span class="badge bg-success text-white fs-6 px-3 py-2">${item.quantity}</span>
+                  </td>
+              </tr>
+          `).join('');
+      } else {
+          itemsHtml = `
+              <tr>
+                  <td colspan="2" class="text-center text-muted py-5">
+                      <i class="fas fa-box-open fa-3x mb-3"></i>
+                      <br>
+                      <h5>Henüz ürün eklenmemiş</h5>
+                      <p>Bu siparişte henüz hiç ürün bulunmuyor.</p>
+                  </td>
+              </tr>
+          `;
+      }
+      
+      modalBody.innerHTML = `
+          <div class="row mb-3">
+              <div class="col-12">
+                  <div class="alert alert-info">
+                      <i class="fas fa-info-circle me-2"></i>
+                      <strong>${escapeHtml(customerFullName)}</strong> müşterisinin sipariş ettiği ürünler
+                      <span class="badge bg-primary ms-2">${orderDetails.items ? orderDetails.items.length : 0} ürün</span>
+                  </div>
+              </div>
+          </div>
+          
+          <div class="table-responsive">
+              <table class="table table-bordered table-hover">
+                  <thead class="table-light">
+                      <tr>
+                          <th style="width: 70%;">Ürün Adı</th>
+                          <th class="text-center" style="width: 30%;">Miktar</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      ${itemsHtml}
+                  </tbody>
+              </table>
+          </div>
+      `;
+      
+      // Show modal
+      const modalInstance = new bootstrap.Modal(modal);
+      modalInstance.show();
+    }
+
+    // Global fonksiyonları window objesine ekle
+    window.viewOrder = viewOrder;
   </script>
+
+  <!-- Order Detail Modal -->
+  <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-light">
+          <h5 class="modal-title text-dark" id="orderDetailModalLabel">
+            <i class="fas fa-eye me-2"></i>Sipariş Detayları
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="orderDetailModalBody">
+          <!-- Content will be populated dynamically -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>Kapat
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 
 </html>

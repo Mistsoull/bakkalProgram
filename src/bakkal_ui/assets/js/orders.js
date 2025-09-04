@@ -72,12 +72,18 @@ function initializeElements() {
         initializeDataTable();
     }
     
-    // Set today's date
-    const today = new Date().toISOString().split('T')[0];
+    // Set tomorrow's date as default delivery date
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    
+    const todayStr = today.toISOString().split('T')[0];
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    
     const deliveryDateInput = document.getElementById('order-delivery-date-input');
     if (deliveryDateInput) {
-        deliveryDateInput.value = today;
-        deliveryDateInput.setAttribute('min', today);
+        deliveryDateInput.value = tomorrowStr;
+        deliveryDateInput.setAttribute('min', todayStr);
     }
 }
 
@@ -376,12 +382,83 @@ async function loadOrders() {
         }
 
         ordersDataTable.draw();
+        
+        // Ürün sipariş özetini güncelle
+        updateProductSummary(orders);
 
     } catch (error) {
         console.error('Siparişler yüklenemedi:', error);
         showErrorState();
         showNotification(`Siparişler yüklenirken bir hata oluştu: ${error.message}`, 'error');
     }
+}
+
+/**
+ * Ürün sipariş özetini hesapla ve göster
+ */
+function updateProductSummary(orders) {
+    const summaryContainer = document.getElementById('product-summary');
+    if (!summaryContainer) return;
+
+    // Ürün özetlerini hesapla
+    const productSummary = {};
+    
+    if (orders && orders.length > 0) {
+        orders.forEach(order => {
+            if (order.items && order.items.length > 0) {
+                order.items.forEach(item => {
+                    const productName = item.productName || 'Bilinmeyen Ürün';
+                    if (productSummary[productName]) {
+                        productSummary[productName] += item.quantity || 0;
+                    } else {
+                        productSummary[productName] = item.quantity || 0;
+                    }
+                });
+            }
+        });
+    }
+
+    // Özet HTML'ini oluştur
+    let summaryHtml = '';
+    
+    if (Object.keys(productSummary).length > 0) {
+        Object.entries(productSummary)
+            .sort(([,a], [,b]) => b - a) // Miktara göre azalan sırada sırala
+            .forEach(([productName, totalQuantity]) => {
+                summaryHtml += `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card border-light shadow-sm h-100">
+                            <div class="card-body p-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <h6 class="card-title mb-0 text-truncate me-2" title="${productName}">${productName}</h6>
+                                            <span class="badge fs-5 fw-bold px-3 py-2" style="background-color: #d4edda; color: #000000; border: 1px solid #c3e6cb; font-size: 1.1rem !important;">
+                                                ${totalQuantity} adet
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+    } else {
+        summaryHtml = `
+            <div class="col-12 text-center text-muted">
+                <i class="fas fa-box-open fa-2x mb-3"></i>
+                <p>Henüz sipariş bulunmuyor</p>
+            </div>
+        `;
+    }
+
+    summaryContainer.innerHTML = summaryHtml;
 }
 
 /**
@@ -449,23 +526,19 @@ function createOrderRowData(order) {
         // Müşteri
         `<div class="text-truncate">
             <div class="fw-semibold mb-1">${escapeHtml(customerFullName)}</div>
-            ${order.items && order.items.length > 0 ? 
-                `<small class="text-muted">${order.items.length} ürün</small>` : 
-                '<small class="text-muted">0 ürün</small>'
-            }
         </div>`,
         
         // Teslim Tarihi
         `<span class="text-nowrap">${formatDate(order.deliveryDate)}</span>`,
         
-        // Ödeme Durumu
-        `<span class="badge bg-${order.isPaid ? 'success' : 'warning'}-subtle text-${order.isPaid ? 'success' : 'warning'}">
-            <i class="fas fa-${order.isPaid ? 'check' : 'clock'} me-1"></i>${order.isPaid ? 'Ödendi' : 'Ödenmedi'}
-        </span>`,
-        
         // Durum
         `<span class="badge bg-${statusInfo.color}-subtle text-${statusInfo.color}">
             <i class="${statusInfo.icon} me-1"></i>${statusInfo.text}
+        </span>`,
+        
+        // Ödeme Durumu
+        `<span class="badge bg-${order.isPaid ? 'success' : 'warning'}-subtle text-${order.isPaid ? 'success' : 'warning'}">
+            <i class="fas fa-${order.isPaid ? 'check' : 'clock'} me-1"></i>${order.isPaid ? 'Ödendi' : 'Ödenmedi'}
         </span>`,
         
         // İşlemler
@@ -723,10 +796,14 @@ function resetMainModal() {
         el.classList.remove('is-invalid', 'is-valid');
     });
     
-    // Set today's date again
-    const today = new Date().toISOString().split('T')[0];
+    // Set tomorrow's date as default delivery date again
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    
     const deliveryDateInput = document.getElementById('order-delivery-date-input');
-    if (deliveryDateInput) deliveryDateInput.value = today;
+    if (deliveryDateInput) deliveryDateInput.value = tomorrowStr;
 }
 
 /**
