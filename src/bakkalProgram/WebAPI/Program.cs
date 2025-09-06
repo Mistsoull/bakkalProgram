@@ -45,13 +45,26 @@ builder.Services.AddEndpointsApiExplorer();
 
 // Configure CORS
 builder.Services.AddCors(opt =>
+{
     opt.AddDefaultPolicy(p =>
     {
-        p.WithOrigins("http://ilgazmountainbakkal.com.tr", "null")
+        p.SetIsOriginAllowed(origin => 
+            {
+                // Allow null/empty origin (for local file:// protocol and direct access)
+                if (string.IsNullOrEmpty(origin) || origin == "null") return true;
+                
+                // Allow specific domains
+                return origin.StartsWith("http://ilgazmountainbakkal.com.tr") ||
+                       origin.StartsWith("https://ilgazmountainbakkal.com.tr") ||
+                       origin.StartsWith("http://localhost") ||
+                       origin.StartsWith("https://localhost") ||
+                       origin.StartsWith("file://");
+            })
             .AllowAnyHeader()
-            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
-    })
-);
+            .AllowAnyMethod()
+            .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
+    });
+});
 
 // Configure Swagger
 builder.Services.AddSwaggerGen(opt =>
@@ -70,13 +83,18 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// CORS must be the first middleware after development tools
+app.UseCors();
+
+app.UseRouting();
+
 // Always configure exception middleware for better error handling
 app.ConfigureCustomExceptionMiddleware();
 
 app.UseDbMigrationApplier();
 
-// Use CORS for all environments
-app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

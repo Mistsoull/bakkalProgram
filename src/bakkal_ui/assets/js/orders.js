@@ -20,18 +20,6 @@ let editingItemIndex = -1;
 let customersCache = [];
 let productsCache = [];
 
-/**
- * Sipariş durumuna göre ikon ve renk haritası
- */
-const ORDER_STATUS_MAP = {
-    'pending': { icon: 'fas fa-clock', color: 'warning', text: 'Bekliyor' },
-    'paid': { icon: 'fas fa-check', color: 'success', text: 'Ödendi' },
-    'delivered': { icon: 'fas fa-truck', color: 'info', text: 'Teslim Edildi' },
-    'completed': { icon: 'fas fa-check-circle', color: 'success', text: 'Tamamlandı' },
-    'cancelled': { icon: 'fas fa-times-circle', color: 'danger', text: 'İptal Edildi' },
-    'default': { icon: 'fas fa-question', color: 'secondary', text: 'Bilinmiyor' }
-};
-
 // DOM yüklendiğinde başlat
 document.addEventListener('DOMContentLoaded', function() {
     waitForDependencies();
@@ -112,7 +100,7 @@ function initializeDataTable() {
                     extend: 'copy',
                     text: '<i class="fas fa-copy me-1"></i>Kopyala',
                     exportOptions: {
-                        columns: [0, 1, 2, 3],
+                        columns: [0, 1, 2],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -125,7 +113,7 @@ function initializeDataTable() {
                     text: '<i class="fas fa-file-csv me-1"></i>CSV',
                     filename: 'siparisler_' + new Date().toISOString().slice(0,10),
                     exportOptions: {
-                        columns: [0, 1, 2, 3],
+                        columns: [0, 1, 2],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -139,7 +127,7 @@ function initializeDataTable() {
                     filename: 'siparisler_' + new Date().toISOString().slice(0,10),
                     title: 'Siparişler Listesi',
                     exportOptions: {
-                        columns: [0, 1, 2, 3],
+                        columns: [0, 1, 2],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -155,7 +143,7 @@ function initializeDataTable() {
                     orientation: 'landscape',
                     pageSize: 'A4',
                     exportOptions: {
-                        columns: [0, 1, 2, 3],
+                        columns: [0, 1, 2],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -168,7 +156,7 @@ function initializeDataTable() {
                     text: '<i class="fas fa-print me-1"></i>Yazdır',
                     title: 'Siparişler Listesi',
                     exportOptions: {
-                        columns: [0, 1, 2, 3],
+                        columns: [0, 1, 2],
                         format: {
                             body: function (data, row, column, node) {
                                 return data.replace(/<.*?>/g, '').trim();
@@ -205,7 +193,7 @@ function initializeDataTable() {
             order: [[1, 'desc']], // Teslim tarihine göre yeniden eskiye sırala
             columnDefs: [
                 {
-                    targets: [4], // İşlemler sütunu
+                    targets: [3], // İşlemler sütunu
                     orderable: false,
                     searchable: false,
                     width: "180px",
@@ -504,20 +492,6 @@ function createOrderRowData(order) {
         return date.toLocaleDateString('tr-TR');
     };
 
-    // Durum belirleme
-    const getStatusInfo = (isPaid, isDelivered) => {
-        if (isPaid && isDelivered) {
-            return ORDER_STATUS_MAP.completed;
-        } else if (isPaid) {
-            return ORDER_STATUS_MAP.paid;
-        } else if (isDelivered) {
-            return ORDER_STATUS_MAP.delivered;
-        } else {
-            return ORDER_STATUS_MAP.pending;
-        }
-    };
-
-    const statusInfo = getStatusInfo(order.isPaid, order.isDelivered);
     const customerFullName = order.customerSurname 
         ? `${order.customerName} ${order.customerSurname}`
         : order.customerName;
@@ -530,11 +504,6 @@ function createOrderRowData(order) {
         
         // Teslim Tarihi
         `<span class="text-nowrap">${formatDate(order.deliveryDate)}</span>`,
-        
-        // Durum
-        `<span class="badge bg-${statusInfo.color}-subtle text-${statusInfo.color}">
-            <i class="${statusInfo.icon} me-1"></i>${statusInfo.text}
-        </span>`,
         
         // Ödeme Durumu
         `<span class="badge bg-${order.isPaid ? 'success' : 'warning'}-subtle text-${order.isPaid ? 'success' : 'warning'}">

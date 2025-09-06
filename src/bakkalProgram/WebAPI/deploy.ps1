@@ -25,8 +25,23 @@ Write-Host "Published files are in: $publishPath" -ForegroundColor Cyan
 
 # Copy additional files if needed
 Write-Host "Copying additional configuration files..." -ForegroundColor Yellow
-Copy-Item ".\appsettings.Production.json" -Destination "$publishPath\" -Force
-Copy-Item ".\web.config" -Destination "$publishPath\" -Force
+
+# Copy appsettings.Production.json if it exists, otherwise copy appsettings.json
+if (Test-Path ".\appsettings.Production.json") {
+    Copy-Item ".\appsettings.Production.json" -Destination "$publishPath\" -Force
+    Write-Host "Copied appsettings.Production.json" -ForegroundColor Green
+} else {
+    Write-Host "appsettings.Production.json not found, using appsettings.json instead" -ForegroundColor Yellow
+    Copy-Item ".\appsettings.json" -Destination "$publishPath\" -Force
+}
+
+# Copy web.config if it exists
+if (Test-Path ".\web.config") {
+    Copy-Item ".\web.config" -Destination "$publishPath\" -Force
+    Write-Host "Copied web.config" -ForegroundColor Green
+} else {
+    Write-Host "web.config not found, skipping..." -ForegroundColor Yellow
+}
 
 Write-Host "Ready for Plesk deployment!" -ForegroundColor Green
 Write-Host "Upload the contents of '$publishPath' folder to your Plesk httpdocs directory." -ForegroundColor Cyan
